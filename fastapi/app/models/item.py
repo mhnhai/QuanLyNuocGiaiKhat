@@ -1,13 +1,6 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
 from pydantic import BaseModel, Field
 from typing import Union
-
-MONGO_DETAILS = "mongodb://localhost:27017"
-
-client = AsyncIOMotorClient(MONGO_DETAILS)
-database = client.items_db
-items_collection = database.get_collection("items_collection")
+from bson import ObjectId
 
 class ItemModel(BaseModel):
     id: str = Field(alias="_id", default=None)
