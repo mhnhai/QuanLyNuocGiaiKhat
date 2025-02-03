@@ -10,9 +10,10 @@ const Sidebar = () => {
             </div>
             <nav className="flex-1 p-4 space-y-2">
                 <SidebarItem icon={<FaHome />} label="Trang chủ" to="/" />
-                <SidebarItem icon={<FaBeer />} label="Quản lý Bia" to="/beers" />
+                <SidebarItem icon={<FaBeer />} label="Quản lý sản phẩm" to="/beers" />
                 <SidebarItem icon={<FaUser />} label="Khách hàng" to="/customers" />
                 <SidebarItem icon={<FaCartPlus />} label="Đơn hàng" to="/orders" />
+                <SidebarItem icon={<FaUser />} label="Nhà cung cấp" to="/suppliers" />
                 <SidebarItem icon={<FaCogs />} label="Cài đặt" to="/settings" />
             </nav>
         </div>

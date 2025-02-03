@@ -6,7 +6,7 @@ class ProductService {
     async getAll() {
         try {
             const response = await axios.get(API_URL);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error fetching products:', error);
             throw error;
@@ -16,7 +16,7 @@ class ProductService {
     async getById(productId) {
         try {
             const response = await axios.get(`${API_URL}/${productId}`);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error fetching product with id ${productId}:`, error);
             throw error;
@@ -26,7 +26,7 @@ class ProductService {
     async create(productData) {
         try {
             const response = await axios.post(API_URL, productData);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error creating product:', error);
             throw error;
@@ -36,7 +36,7 @@ class ProductService {
     async update(productId, productData) {
         try {
             const response = await axios.put(`${API_URL}/${productId}`, productData);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error updating product with id ${productId}:`, error);
             throw error;
@@ -46,7 +46,7 @@ class ProductService {
     async delete(productId) {
         try {
             const response = await axios.delete(`${API_URL}/${productId}`);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error deleting product with id ${productId}:`, error);
             throw error;
@@ -56,7 +56,7 @@ class ProductService {
     async deleteAll() {
         try {
             const response = await axios.delete(API_URL);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error deleting all products:', error);
             throw error;

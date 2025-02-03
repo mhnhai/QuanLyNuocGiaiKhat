@@ -36,17 +36,29 @@ async def read_supplier(supplier_id: str):
         logger.error(f"Error retrieving supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/suppliers", response_model=SupplierModel)
-async def create_supplier(supplier: SupplierModel):
+@router.put("/suppliers/{supplier_id}", response_model=SupplierModel)
+async def update_supplier(supplier_id: str, supplier: SupplierModel):
     try:
-        supplier_dict = supplier.dict(by_alias=True, exclude_unset=True)
+        if not ObjectId.is_valid(supplier_id):
+            raise HTTPException(status_code=400, detail="Invalid ObjectId")
+        
+        supplier_dict = supplier.dict()
         if "_id" in supplier_dict:
-            del supplier_dict["_id"]  # Ensure _id is not included in the document to let MongoDB generate it
-        result = await suppliers_collection.insert_one(supplier_dict)
-        supplier_dict["_id"] = str(result.inserted_id)
-        return SupplierModel(**supplier_dict)
+            del supplier_dict["_id"]  # Remove the _id field from the update data
+        
+        result = await suppliers_collection.update_one(
+            {"_id": ObjectId(supplier_id)},
+            {"$set": supplier_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Supplier not found")
+        
+        updated_supplier = await suppliers_collection.find_one({"_id": ObjectId(supplier_id)})
+        updated_supplier["_id"] = str(updated_supplier["_id"])  # Convert ObjectId to string
+        return SupplierModel(**updated_supplier)
     except Exception as e:
-        logger.error(f"Error creating supplier: {e}")
+        logger.error(f"Error updating supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/suppliers/{supplier_id}", response_model=SupplierModel)

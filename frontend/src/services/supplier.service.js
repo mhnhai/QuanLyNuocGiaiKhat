@@ -6,7 +6,7 @@ class SupplierService {
     async getAll() {
         try {
             const response = await axios.get(API_URL);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error fetching suppliers:', error);
             throw error;
@@ -16,7 +16,7 @@ class SupplierService {
     async getById(supplierId) {
         try {
             const response = await axios.get(`${API_URL}/${supplierId}`);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error fetching supplier with id ${supplierId}:`, error);
             throw error;
@@ -26,7 +26,7 @@ class SupplierService {
     async create(supplierData) {
         try {
             const response = await axios.post(API_URL, supplierData);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error creating supplier:', error);
             throw error;
@@ -36,7 +36,7 @@ class SupplierService {
     async update(supplierId, supplierData) {
         try {
             const response = await axios.put(`${API_URL}/${supplierId}`, supplierData);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error updating supplier with id ${supplierId}:`, error);
             throw error;
@@ -46,7 +46,7 @@ class SupplierService {
     async delete(supplierId) {
         try {
             const response = await axios.delete(`${API_URL}/${supplierId}`);
-            return response.data;
+            return response;
         } catch (error) {
             console.error(`Error deleting supplier with id ${supplierId}:`, error);
             throw error;
@@ -56,7 +56,7 @@ class SupplierService {
     async deleteAll() {
         try {
             const response = await axios.delete(API_URL);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error deleting all suppliers:', error);
             throw error;

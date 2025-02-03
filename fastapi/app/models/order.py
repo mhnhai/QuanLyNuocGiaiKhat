@@ -1,19 +1,24 @@
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import List
 from bson import ObjectId
-from datetime import datetime
+from datetime import date
+from .orderitem import OrderItem
 
 class OrderModel(BaseModel):
     id: str = Field(alias="_id", default=None)
     id_customer: str
     id_staff: str
-    order_date: datetime
-    shipping_date: datetime
+    # order_date: date
+    # shipping_date: date
     form_payment: str
     total_price: float
     status: str
-    
+    order_items: List[OrderItem]
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+        json_encoders = {
+            ObjectId: str,
+            date: lambda v: v.strftime("%d-%m-%Y")
+        }

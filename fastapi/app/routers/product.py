@@ -48,18 +48,27 @@ async def create_product(product: ProductModel):
     except Exception as e:
         logger.error(f"Error creating product: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    
 @router.put("/products/{product_id}", response_model=ProductModel)
-async def update_product(product_id: str, updated_product: ProductModel):
+async def update_product(product_id: str, product: ProductModel):
     try:
         if not ObjectId.is_valid(product_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
-        product_dict = updated_product.dict(by_alias=True, exclude_unset=True)
-        result = await products_collection.update_one({"_id": ObjectId(product_id)}, {"$set": product_dict})
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="product not found")
-        product_dict["_id"] = product_id
-        return ProductModel(**product_dict)
+        
+        product_dict = product.dict()
+        if "_id" in product_dict:
+            del product_dict["_id"]  # Remove the _id field from the update data
+        
+        result = await products_collection.update_one(
+            {"_id": ObjectId(product_id)},
+            {"$set": product_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        updated_product = await products_collection.find_one({"_id": ObjectId(product_id)})
+        updated_product["_id"] = str(updated_product["_id"])  # Convert ObjectId to string
+        return ProductModel(**updated_product)
     except Exception as e:
         logger.error(f"Error updating product with id {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

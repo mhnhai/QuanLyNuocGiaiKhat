@@ -50,16 +50,26 @@ async def create_staff(staff: StaffModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/staffs/{staff_id}", response_model=StaffModel)
-async def update_staff(staff_id: str, updated_staff: StaffModel):
+async def update_staff(staff_id: str, staff: StaffModel):
     try:
         if not ObjectId.is_valid(staff_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
-        staff_dict = updated_staff.dict(by_alias=True, exclude_unset=True)
-        result = await staffs_collection.update_one({"_id": ObjectId(staff_id)}, {"$set": staff_dict})
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="staff not found")
-        staff_dict["_id"] = staff_id
-        return StaffModel(**staff_dict)
+        
+        staff_dict = staff.dict()
+        if "_id" in staff_dict:
+            del staff_dict["_id"]  # Remove the _id field from the update data
+        
+        result = await staffs_collection.update_one(
+            {"_id": ObjectId(staff_id)},
+            {"$set": staff_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Staff not found")
+        
+        updated_staff = await staffs_collection.find_one({"_id": ObjectId(staff_id)})
+        updated_staff["_id"] = str(updated_staff["_id"])  # Convert ObjectId to string
+        return StaffModel(**updated_staff)
     except Exception as e:
         logger.error(f"Error updating staff with id {staff_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

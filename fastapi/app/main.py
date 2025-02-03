@@ -83,7 +83,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import item, account, product, staff, supplier, order, order_details
+from app.routers import item, account, product, staff, supplier, order
     
 origins =[
     "http://localhost:3000",
@@ -106,7 +106,7 @@ app.include_router(account.router, prefix="/api")
 app.include_router(staff.router, prefix="/api")
 app.include_router(supplier.router, prefix="/api")
 app.include_router(order.router, prefix="/api")
-# app.include_router(order_details.router, prefix="/api/v1")                                                                                                                        
+# app.include_router(order_detail.router, prefix="/api")                                                                                                                        
 
 @app.get("/")
 def read_root():

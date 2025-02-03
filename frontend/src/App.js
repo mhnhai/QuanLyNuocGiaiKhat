@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
+import Suppliers from "./pages/Suppliers";
 import Settings from "./pages/Settings";
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
                         <Route path="/beers" element={<Products />} />
                         <Route path="/customers" element={<Customers />} />
                         <Route path="/orders" element={<Orders />} />
+                        <Route path="/suppliers" element={<Suppliers />} />
                         <Route path="/settings" element={<Settings />} />
                     </Routes>
                 </div>

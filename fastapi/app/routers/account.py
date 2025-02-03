@@ -50,16 +50,26 @@ async def create_account(account: AccountModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/accounts/{account_id}", response_model=AccountModel)
-async def update_account(account_id: str, updated_account: AccountModel):
+async def update_account(account_id: str, account: AccountModel):
     try:
         if not ObjectId.is_valid(account_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
-        account_dict = updated_account.dict(by_alias=True, exclude_unset=True)
-        result = await accounts_collection.update_one({"_id": ObjectId(account_id)}, {"$set": account_dict})
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="account not found")
-        account_dict["_id"] = account_id
-        return AccountModel(**account_dict)
+        
+        account_dict = account.dict()
+        if "_id" in account_dict:
+            del account_dict["_id"]  # Remove the _id field from the update data
+        
+        result = await accounts_collection.update_one(
+            {"_id": ObjectId(account_id)},
+            {"$set": account_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Account not found")
+        
+        updated_account = await accounts_collection.find_one({"_id": ObjectId(account_id)})
+        updated_account["_id"] = str(updated_account["_id"])  # Convert ObjectId to string
+        return AccountModel(**updated_account)
     except Exception as e:
         logger.error(f"Error updating account with id {account_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
