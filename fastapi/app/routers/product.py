@@ -48,6 +48,7 @@ async def create_product(product: ProductModel):
     except Exception as e:
         logger.error(f"Error creating product: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    
 @router.put("/products/{product_id}", response_model=ProductModel)
 async def update_product(product_id: str, product: ProductModel):
     try:

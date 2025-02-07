@@ -8,6 +8,7 @@ import Orders from "./pages/Orders";
 import Suppliers from "./pages/Suppliers";
 import Settings from "./pages/Settings";
 
+
 const App = () => {
     return (
         <Router>

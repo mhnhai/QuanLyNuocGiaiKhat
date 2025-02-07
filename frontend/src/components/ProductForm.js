@@ -14,6 +14,11 @@ const ProductForm = ({ product, onSave }) => {
         origin: '',
         description: '',
     });
+
+    const categories = [   { key: 'barrel', name: 'Thùng' },
+        { key: 'pack', name: 'Lốc 6 lon' },
+        { key: 'case', name: 'Kết' },];
+
     const [suppliers, setSuppliers] = useState([]);
 
     useEffect(() => {
@@ -89,9 +94,15 @@ const ProductForm = ({ product, onSave }) => {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Loại hàng:</label>
-                    <input type="text" name="category" value={formData.category} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <select name="category" value={formData.category} onChange={handleChange} required
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="">-- Chọn loại hàng --</option>
+                        {categories.map((category) => (
+                            <option key={category.key} value={category.name}>{category.name}</option>
+                        ))}
+                    </select>
                 </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Số lượng:</label>
                     <input type="number" name="stock" value={formData.stock} onChange={handleChange} required

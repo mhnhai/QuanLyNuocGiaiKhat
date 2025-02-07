@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import SupplierService from "../services/supplier.service";
+import StaffService from "../services/staff.service";
 
-const SupplierForm = ({ supplier, onSave }) => {
+const StaffForm = ({ staff, onSave }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -10,10 +10,10 @@ const SupplierForm = ({ supplier, onSave }) => {
     });
 
     useEffect(() => {
-        if (supplier) {
-            setFormData(supplier);
+        if (staff) {
+            setFormData(staff);
         }
-    }, [supplier]);
+    }, [staff]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,14 +27,14 @@ const SupplierForm = ({ supplier, onSave }) => {
         e.preventDefault();
         try {
             let response;
-            if (supplier) {
-                response = await SupplierService.update(supplier._id, formData);
+            if (staff) {
+                response = await StaffService.update(staff._id, formData);
             } else {
-                response = await SupplierService.create(formData);
+                response = await StaffService.create(formData);
             }
             onSave(response.data);
         } catch (error) {
-            console.error('Error saving supplier:', error);
+            console.error('Error saving staff:', error);
         }
     };
 
@@ -90,10 +90,10 @@ const SupplierForm = ({ supplier, onSave }) => {
                 type="submit"
                 className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-                Save Supplier
+                Save Staff
             </button>
         </form>
     );
 };
 
-export default SupplierForm;
+export default StaffForm;

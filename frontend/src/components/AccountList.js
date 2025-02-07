@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import AccountService from "../services/account.service";
+import AccountForm from "./AccountForm";
+import Modal from "react-modal";
 
 const AccountList = () => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState(null);
 
     useEffect(() => {
         AccountService.getAll()
             .then((response) => {
                 setAccounts(response.data);
                 setLoading(false);
-                console.log(response.data);
             })
             .catch((e) => {
                 console.error(e);
@@ -27,38 +30,78 @@ const AccountList = () => {
         }
     };
 
+    const toggleModal = (account = null) => {
+        setSelectedAccount(account);
+        setModalIsOpen(!modalIsOpen);
+    };
+
+    const handleAccountSave = (savedAccount) => {
+        setAccounts((prevAccounts) => {
+            const existingAccountIndex = prevAccounts.findIndex(account => account._id === savedAccount._id);
+            if (existingAccountIndex !== -1) {
+                const updatedAccounts = [...prevAccounts];
+                updatedAccounts[existingAccountIndex] = savedAccount;
+                return updatedAccounts;
+            } else {
+                return [...prevAccounts, savedAccount];
+            }
+        });
+        toggleModal();
+    };
+
+    const modalStyles = {
+        content: {
+            width: '50%', // Adjust the width as needed
+            height: '80%', // Adjust the height as needed
+            margin: 'auto', // Center the modal
+            padding: '20px', // Add padding if needed
+        },
+    };
+
     return (
-        <div>
-            <h1>Account List</h1>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Account List</h1>
+            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Account</button>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={toggleModal}
+                style={modalStyles}
+            >
+                <div>
+                    <AccountForm account={selectedAccount} onSave={handleAccountSave} />
+                    <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Close</button>
+                </div>
+            </Modal>
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Phone</th>
-                        <th>Role</th>
-                        <th>Address</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {accounts.map((account) => (
-                        <tr key={account._id}>
-                            <td>{account._id}</td>
-                            <td>{account.username}</td>
-                            <td>{account.phone}</td>
-                            <td>{account.role_account}</td>
-                            <td>{account.address}</td>
-                            <td>
-                                <button onClick={() => handleDelete(account._id)}>Delete</button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
+                    <table className="min-w-full bg-white">
+                        <thead className="sticky top-0 bg-white">
+                            <tr>
+                                <th className="py-2 px-4 border-b">ID</th>
+                                <th className="py-2 px-4 border-b">Name</th>
+                                <th className="py-2 px-4 border-b">Phone</th>
+                                <th className="py-2 px-4 border-b">Role</th>
+                                <th className="py-2 px-4 border-b">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {accounts.map((account) => (
+                            <tr key={account._id}>
+                                <td className="py-2 px-4 border-b">{account._id}</td>
+                                <td className="py-2 px-4 border-b">{account.username}</td>
+                                <td className="py-2 px-4 border-b">{account.phone}</td>
+                                <td className="py-2 px-4 border-b">{account.role_account}</td>
+                                <td className="py-2 px-4 border-b">
+                                    <button onClick={() => toggleModal(account)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
+                                    <button onClick={() => handleDelete(account._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
         </div>
     );

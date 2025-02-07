@@ -8,7 +8,6 @@ class AccountModel(BaseModel):
     password: str
     role_account: str 
     phone: str 
-    # phone: str = Field(..., description="Phone number must be between 10 and 15 characters", min_length=10, max_length=10)
     address: str
     
     class Config:

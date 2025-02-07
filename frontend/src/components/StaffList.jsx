@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import SupplierService from "../services/supplier.service";
-import SupplierForm from "./SupplierForm";
+import StaffService from "../services/staff.service";
+import StaffForm from "./StaffForm";
 import Modal from "react-modal";
 
-const SupplierList = () => {
-    const [suppliers, setSuppliers] = useState([]);
+const StaffList = () => {
+    const [staffs, setStaffs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [selectedStaff, setSelectedStaff] = useState(null);
 
     useEffect(() => {
-        SupplierService.getAll()
+        StaffService.getAll()
             .then((response) => {
-                setSuppliers(response.data);
+                setStaffs(response.data);
                 setLoading(false);
             })
             .catch((e) => {
@@ -23,27 +23,27 @@ const SupplierList = () => {
 
     const handleDelete = async (id) => {
         try {
-            await SupplierService.delete(id);
-            setSuppliers(suppliers.filter((supplier) => supplier._id !== id));
+            await StaffService.delete(id);
+            setStaffs(staffs.filter((staff) => staff._id !== id));
         } catch (error) {
             console.error(error);
         }
     };
 
-    const toggleModal = (supplier = null) => {
-        setSelectedSupplier(supplier);
+    const toggleModal = (staff = null) => {
+        setSelectedStaff(staff);
         setModalIsOpen(!modalIsOpen);
     }
 
-    const handleSupplierSave = (savedSupplier) => {
-        setSuppliers((prevSuppliers) => {
-            const existingSupplierIndex = prevSuppliers.findIndex(supplier => supplier._id === savedSupplier._id);
-            if (existingSupplierIndex !== -1) {
-                const updatedSuppliers = [...prevSuppliers];
-                updatedSuppliers[existingSupplierIndex] = savedSupplier;
-                return updatedSuppliers;
+    const handleStaffSave = (savedStaff) => {
+        setStaffs((prevStaffs) => {
+            const existingStaffIndex = prevStaffs.findIndex(staff => staff._id === savedStaff._id);
+            if (existingStaffIndex !== -1) {
+                const updatedStaffs = [...prevStaffs];
+                updatedStaffs[existingStaffIndex] = savedStaff;
+                return updatedStaffs;
             } else {
-                return [...prevSuppliers, savedSupplier];
+                return [...prevStaffs, savedStaff];
             }
         });
         toggleModal();
@@ -60,10 +60,10 @@ const SupplierList = () => {
 
     return(
         <div className="container mx-auto p-4">
-            <button onClick={toggleModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">Add Supplier</button>
+            <button onClick={toggleModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">Add Staff</button>
             <Modal isOpen={modalIsOpen} style={modalStyles} onRequestClose={toggleModal}>
                 <div>
-                    <SupplierForm supplier={selectedSupplier} onSave={handleSupplierSave} />
+                    <StaffForm staff={selectedStaff} onSave={handleStaffSave} />
                     <button onClick={toggleModal} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded my-4">Close</button>
                 </div>
             </Modal>
@@ -80,18 +80,18 @@ const SupplierList = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {suppliers.map((supplier) => (
-                        <tr key={supplier._id}>
-                            <td className="py-2 px-4 border-b">{supplier._id}</td>
-                            <td className="py-2 px-4 border-b">{supplier.name}</td>
-                            <td className="py-2 px-4 border-b">{supplier.email}</td>
-                            <td className="py-2 px-4 border-b">{supplier.phone}</td>
-                            <td className="py-2 px-4 border-b">{supplier.address}</td>
+                    {staffs.map((staff) => (
+                        <tr key={staff._id}>
+                            <td className="py-2 px-4 border-b">{staff._id}</td>
+                            <td className="py-2 px-4 border-b">{staff.name}</td>
+                            <td className="py-2 px-4 border-b">{staff.email}</td>
+                            <td className="py-2 px-4 border-b">{staff.phone}</td>
+                            <td className="py-2 px-4 border-b">{staff.address}</td>
                             <td className="py-2 px-4 border-b">
-                                <button onClick={() => toggleModal(supplier)}
+                                <button onClick={() => toggleModal(staff)}
                                         className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit
                                 </button>
-                                <button onClick={() => handleDelete(supplier._id)}
+                                <button onClick={() => handleDelete(staff._id)}
                                         className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete
                                 </button>
                             </td>
@@ -104,4 +104,4 @@ const SupplierList = () => {
     );
 }
 
-export default SupplierList;
+export default StaffList;
