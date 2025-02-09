@@ -33,7 +33,7 @@ const SupplierList = () => {
     const toggleModal = (supplier = null) => {
         setSelectedSupplier(supplier);
         setModalIsOpen(!modalIsOpen);
-    }
+    };
 
     const handleSupplierSave = (savedSupplier) => {
         setSuppliers((prevSuppliers) => {
@@ -47,7 +47,7 @@ const SupplierList = () => {
             }
         });
         toggleModal();
-    }
+    };
 
     const modalStyles = {
         content: {
@@ -58,48 +58,51 @@ const SupplierList = () => {
         },
     };
 
-    return(
+    return (
         <div className="container mx-auto p-4">
-            <button onClick={toggleModal} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">Add Supplier</button>
-            <Modal isOpen={modalIsOpen} style={modalStyles} onRequestClose={toggleModal}>
+            <h1 className="text-2xl font-bold mb-4">Supplier List</h1>
+            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Supplier</button>
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={toggleModal}
+                style={modalStyles}
+            >
                 <div>
                     <SupplierForm supplier={selectedSupplier} onSave={handleSupplierSave} />
-                    <button onClick={toggleModal} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded my-4">Close</button>
+                    <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Close</button>
                 </div>
             </Modal>
-            <div className="overflow-auto" style={{height: '72vh'}}>
-                <table className="min-w-full bg-white">
-                    <thead className="sticky top-0 bg-white">
-                    <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Name</th>
-                        <th className="py-2 px-4 border-b">Email</th>
-                        <th className="py-2 px-4 border-b">Address</th>
-                        <th className="py-2 px-4 border-b">Phone</th>
-                        <th className="py-2 px-4 border-b">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {suppliers.map((supplier) => (
-                        <tr key={supplier._id}>
-                            <td className="py-2 px-4 border-b">{supplier._id}</td>
-                            <td className="py-2 px-4 border-b">{supplier.name}</td>
-                            <td className="py-2 px-4 border-b">{supplier.email}</td>
-                            <td className="py-2 px-4 border-b">{supplier.phone}</td>
-                            <td className="py-2 px-4 border-b">{supplier.address}</td>
-                            <td className="py-2 px-4 border-b">
-                                <button onClick={() => toggleModal(supplier)}
-                                        className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit
-                                </button>
-                                <button onClick={() => handleDelete(supplier._id)}
-                                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete
-                                </button>
-                            </td>
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
+                    <table className="min-w-full bg-white">
+                        <thead className="sticky top-0 bg-white">
+                        <tr>
+                            <th className="py-2 px-4 border-b">ID</th>
+                            <th className="py-2 px-4 border-b">Name</th>
+                            <th className="py-2 px-4 border-b">Phone</th>
+                            <th className="py-2 px-4 border-b">Role</th>
+                            <th className="py-2 px-4 border-b">Action</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        {suppliers.map((supplier) => (
+                            <tr key={supplier._id}>
+                                <td className="py-2 px-4 border-b">{supplier._id}</td>
+                                <td className="py-2 px-4 border-b">{supplier.username}</td>
+                                <td className="py-2 px-4 border-b">{supplier.phone}</td>
+                                <td className="py-2 px-4 border-b">{supplier.role_supplier}</td>
+                                <td className="py-2 px-4 border-b">
+                                    <button onClick={() => toggleModal(supplier)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
+                                    <button onClick={() => handleDelete(supplier._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }

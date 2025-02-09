@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from app.database import order_details_collection
-from app.models.orderdetail import OrderDetailModel
+from app.models.orderitem import OrderDetailModel
 from bson import ObjectId
 import logging
 

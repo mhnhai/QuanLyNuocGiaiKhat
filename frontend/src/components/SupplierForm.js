@@ -6,9 +6,8 @@ const SupplierForm = ({ supplier, onSave }) => {
         name: '',
         email: '',
         address: '',
-        phone: ''
+        phone: '',
     });
-
     useEffect(() => {
         if (supplier) {
             setFormData(supplier);
@@ -42,7 +41,7 @@ const SupplierForm = ({ supplier, onSave }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Name:</label>
+                    <label className="block text-sm font-medium text-gray-700">name:</label>
                     <input
                         type="text"
                         name="name"
@@ -53,7 +52,7 @@ const SupplierForm = ({ supplier, onSave }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Email:</label>
+                    <label className="block text-sm font-medium text-gray-700">email:</label>
                     <input
                         type="email"
                         name="email"
@@ -64,7 +63,7 @@ const SupplierForm = ({ supplier, onSave }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Address:</label>
+                    <label className="block text-sm font-medium text-gray-700">address:</label>
                     <input
                         type="text"
                         name="address"
@@ -75,7 +74,7 @@ const SupplierForm = ({ supplier, onSave }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                    <label className="block text-sm font-medium text-gray-700">phone:</label>
                     <input
                         type="text"
                         name="phone"

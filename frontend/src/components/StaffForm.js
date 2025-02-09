@@ -4,14 +4,19 @@ import StaffService from "../services/staff.service";
 const StaffForm = ({ staff, onSave }) => {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
-        address: '',
-        phone: ''
+        position: '',
+        birth_date: '',
+        salary: '',
     });
 
     useEffect(() => {
         if (staff) {
-            setFormData(staff);
+            setFormData({
+                name: staff.name || '',
+                position: staff.position || '',
+                birth_date: staff.birth_date || '',
+                salary: staff.salary || '',
+            });
         }
     }, [staff]);
 
@@ -27,7 +32,7 @@ const StaffForm = ({ staff, onSave }) => {
         e.preventDefault();
         try {
             let response;
-            if (staff) {
+            if (staff && staff._id) {
                 response = await StaffService.update(staff._id, formData);
             } else {
                 response = await StaffService.create(formData);
@@ -53,38 +58,38 @@ const StaffForm = ({ staff, onSave }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Email:</label>
+                    <label className="block text-sm font-medium text-gray-700">Position:</label>
                     <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
+                        type="text"
+                        name="position"
+                        value={formData.position}
                         onChange={handleChange}
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Address:</label>
+                    <label className="block text-sm font-medium text-gray-700">Salary:</label>
                     <input
-                        type="text"
-                        name="address"
-                        value={formData.address}
+                        type="number"
+                        name="salary"
+                        step="0.01"
+                        value={formData.salary}
                         onChange={handleChange}
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                    <label className="block text-sm font-medium text-gray-700">Birth Date:</label>
                     <input
-                        type="text"
-                        name="phone"
-                        value={formData.phone}
+                        type="date"
+                        name="birth_date"
+                        value={formData.birth_date}
                         onChange={handleChange}
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
-                </div>
             </div>
             <button
                 type="submit"
@@ -92,6 +97,7 @@ const StaffForm = ({ staff, onSave }) => {
             >
                 Save Staff
             </button>
+            </div>
         </form>
     );
 };

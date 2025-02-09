@@ -1,5 +1,4 @@
 import React from "react";
-import SupplierForm from "../components/SupplierForm";
 import SupplierList from "../components/SupplierList";
 const Customers = () => {
     return (

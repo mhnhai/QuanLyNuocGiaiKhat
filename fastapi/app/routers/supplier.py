@@ -50,16 +50,26 @@ async def create_supplier(supplier: SupplierModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/suppliers/{supplier_id}", response_model=SupplierModel)
-async def update_supplier(supplier_id: str, updated_supplier: SupplierModel):
+async def update_supplier(supplier_id: str, supplier: SupplierModel):
     try:
         if not ObjectId.is_valid(supplier_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
-        supplier_dict = updated_supplier.dict(by_alias=True, exclude_unset=True)
-        result = await suppliers_collection.update_one({"_id": ObjectId(supplier_id)}, {"$set": supplier_dict})
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="supplier not found")
-        supplier_dict["_id"] = supplier_id
-        return SupplierModel(**supplier_dict)
+        
+        supplier_dict = supplier.dict()
+        if "_id" in supplier_dict:
+            del supplier_dict["_id"]  # Remove the _id field from the update data
+        
+        result = await suppliers_collection.update_one(
+            {"_id": ObjectId(supplier_id)},
+            {"$set": supplier_dict}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Supplier not found")
+        
+        updated_supplier = await suppliers_collection.find_one({"_id": ObjectId(supplier_id)})
+        updated_supplier["_id"] = str(updated_supplier["_id"])  # Convert ObjectId to string
+        return SupplierModel(**updated_supplier)
     except Exception as e:
         logger.error(f"Error updating supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
