@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Customers from "./pages/Customers";
 import Orders from "./pages/Orders";
+import Importation from "./pages/Importation";
 import Staffs from "./pages/Staffs";
 import Suppliers from "./pages/Suppliers";
 import Settings from "./pages/Settings";
@@ -21,6 +22,7 @@ const App = () => {
                         <Route path="/products" element={<Products />} />
                         <Route path="/customers" element={<Customers />} />
                         <Route path="/orders" element={<Orders />} />
+                        <Route path="/importations" element={<Importation />} />
                         <Route path="/staffs" element={<Staffs />} />
                         <Route path="/suppliers" element={<Suppliers />} />
                         <Route path="/settings" element={<Settings />} />

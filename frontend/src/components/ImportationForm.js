@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import OrderService from "../services/order.service";
+import ImportationService from "../services/importation.service";
 import ProductService from "../services/product.service";
 
-const OrderForm = ({ order, onSave }) => {
-    const [formData, setFormData] = useState(order || {
-        id_customer: '',
+const ImportationForm = ({ importation, onSave }) => {
+    const [formData, setFormData] = useState(importation || {
+        id_supplier: '',
         id_staff: '',
-        order_date: '',
-        shipping_date: '',
-        form_payment: '',
+        import_date: '',
         total_price: '',
-        status: '',
-        order_items: [{id_product: '', quantity: '', selling_price: ''}]
+        import_items: [{id_product: '', quantity: '', import_price: ''}]
     });
 
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
-        if (order) {
-            setFormData(order);
+        if (importation) {
+            setFormData(importation);
         }
-    }, [order]);
+    }, [importation]);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -34,9 +31,9 @@ const OrderForm = ({ order, onSave }) => {
         fetchProducts();
     }, []);
 
-    const calculateTotalPrice = (orderItems) => {
-        return orderItems.reduce((total, item) => {
-            return total + (item.selling_price * item.quantity);
+    const calculateTotalPrice = (importItems) => {
+        return importItems.reduce((total, item) => {
+            return total + (item.import_price * item.quantity);
         }, 0);
     };
 
@@ -48,15 +45,14 @@ const OrderForm = ({ order, onSave }) => {
         });
     };
 
-
     const handleProductChange = (index, e) => {
         const { name, value } = e.target;
-        const updatedProducts = formData.order_items.map((product, i) => {
+        const updatedProducts = formData.import_items.map((product, i) => {
             if (i === index) {
                 const updatedProduct = { ...product, [name]: value };
                 if (name === 'id_product') {
                     const selectedProduct = products.find(p => p._id === value);
-                    updatedProduct.selling_price = selectedProduct ? selectedProduct.selling_price : '';
+                    updatedProduct.import_price = selectedProduct ? selectedProduct.import_price : '';
                 }
                 return updatedProduct;
             }
@@ -65,7 +61,7 @@ const OrderForm = ({ order, onSave }) => {
         const totalPrice = calculateTotalPrice(updatedProducts);
         setFormData({
             ...formData,
-            order_items: updatedProducts,
+            import_items: updatedProducts,
             total_price: totalPrice
         });
     };
@@ -73,48 +69,47 @@ const OrderForm = ({ order, onSave }) => {
     const addProduct = () => {
         setFormData({
             ...formData,
-            order_items: [...formData.order_items, {id_product: '', quantity: '', selling_price: ''}]
+            import_items: [...formData.import_items, {id_product: '', quantity: '', import_price: ''}]
         });
     };
 
     const removeProduct = (index) => {
-        const updatedProducts = formData.order_items.filter((_, i) => i !== index);
+        const updatedProducts = formData.import_items.filter((_, i) => i !== index);
         setFormData({
             ...formData,
-            order_items: updatedProducts
+            import_items: updatedProducts
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Update formData with the selling_price of each product
-            const updatedOrderItems = formData.order_items.map(item => {
+            const updatedImportItems = formData.import_items.map(item => {
                 const product = products.find(p => p._id === item.id_product);
                 return {
                     ...item,
-                    selling_price: product ? product.selling_price : item.selling_price
+                    import_price: product ? product.import_price : item.import_price
                 };
             });
 
             const updatedFormData = {
                 ...formData,
-                order_items: updatedOrderItems
+                import_items: updatedImportItems
             };
 
             let response;
-            if (order) {
-                response = await OrderService.update(order._id, updatedFormData);
+            if (importation) {
+                response = await ImportationService.update(importation._id, updatedFormData);
             } else {
-                response = await OrderService.create(updatedFormData);
+                response = await ImportationService.create(updatedFormData);
             }
 
-            for (const item of updatedOrderItems) {
+            for (const item of updatedImportItems) {
                 const product = products.find(p => p._id === item.id_product);
                 if (product) {
                     const updatedProduct = {
                         ...product,
-                        stock: product.stock - parseInt(item.quantity, 10)
+                        stock: product.stock + parseInt(item.quantity, 10)
                     };
                     await ProductService.update(product._id, updatedProduct);
                 }
@@ -122,7 +117,7 @@ const OrderForm = ({ order, onSave }) => {
 
             onSave(response.data);
         } catch (error) {
-            console.error('Error saving order:', error);
+            console.error('Error saving importation:', error);
         }
     };
 
@@ -130,8 +125,8 @@ const OrderForm = ({ order, onSave }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Customer ID:</label>
-                    <input type="text" name="id_customer" value={formData.id_customer} onChange={handleChange} required
+                    <label className="block text-sm font-medium text-gray-700">Supplier ID:</label>
+                    <input type="text" name="id_supplier" value={formData.id_supplier} onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
@@ -139,19 +134,9 @@ const OrderForm = ({ order, onSave }) => {
                     <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
-                {/*<div>*/}
-                {/*    <label className="block text-sm font-medium text-gray-700">Order Date: {formData.order_date}</label>*/}
-                {/*    <input type="date" name="order_date" value={formData.order_date} onChange={handleChange} required*/}
-                {/*           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>*/}
-                {/*</div>*/}
-                {/*<div>*/}
-                {/*    <label className="block text-sm font-medium text-gray-700">Shipping Date: {formData.shipping_date}</label>*/}
-                {/*    <input type="date" name="shipping_date" value={formData.shipping_date} onChange={handleChange} required*/}
-                {/*           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>*/}
-                {/*</div>*/}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Form of Payment:</label>
-                    <input type="text" name="form_payment" value={formData.form_payment} onChange={handleChange} required
+                    <label className="block text-sm font-medium text-gray-700">Import Date:</label>
+                    <input type="date" name="import_date" value={formData.import_date} onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
@@ -159,15 +144,10 @@ const OrderForm = ({ order, onSave }) => {
                     <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Status:</label>
-                    <input type="text" name="status" value={formData.status} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
-                </div>
             </div>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Products:</label>
-                {formData.order_items.map((product, index) => (
+                {formData.import_items.map((product, index) => (
                     <div key={index} className="grid grid-cols-4 gap-3 mb-2">
                         <select name="id_product" value={product.id_product} onChange={(e) => handleProductChange(index, e)} required
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -177,19 +157,19 @@ const OrderForm = ({ order, onSave }) => {
                             ))}
                         </select>
                         <input type="number" name="quantity" value={product.quantity} onChange={(e) => handleProductChange(index, e)} required
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Quantity"/>
-                        <input type="text" name="selling_price" value={product.selling_price} disabled
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Selling Price"/>
+                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                        <input type="text" name="import_price" value={product.import_price} disabled
+                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                         <button type="button" onClick={() => removeProduct(index)} className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove</button>
                     </div>
                 ))}
                 <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product</button>
             </div>
             <button type="submit"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Order
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Importation
             </button>
         </form>
     );
 };
 
-export default OrderForm;
+export default ImportationForm;

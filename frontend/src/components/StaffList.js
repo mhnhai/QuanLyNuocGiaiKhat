@@ -79,21 +79,21 @@ const StaffList = () => {
                     <table className="min-w-full bg-white">
                         <thead className="sticky top-0 bg-white">
                         <tr>
-                            <th className="py-2 px-4 border-b">ID</th>
-                            <th className="py-2 px-4 border-b">Name</th>
-                            <th className="py-2 px-4 border-b">position</th>
-                            <th className="py-2 px-4 border-b">salary</th>
-                            <th className="py-2 px-4 border-b">Action</th>
+                            <th className="py-2 px-4 border">ID</th>
+                            <th className="py-2 px-4 border">Name</th>
+                            <th className="py-2 px-4 border">position</th>
+                            <th className="py-2 px-4 border">salary</th>
+                            <th className="py-2 px-4 border">Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         {staffs.map((staff) => (
                             <tr key={staff._id}>
-                                <td className="py-2 px-4 border-b">{staff._id}</td>
-                                <td className="py-2 px-4 border-b">{staff.name}</td>
-                                <td className="py-2 px-4 border-b">{staff.position}</td>
-                                <td className="py-2 px-4 border-b">{staff.salary}</td>
-                                <td className="py-2 px-4 border-b">
+                                <td className="py-2 px-4 border">{staff._id}</td>
+                                <td className="py-2 px-4 border">{staff.name}</td>
+                                <td className="py-2 px-4 border">{staff.position}</td>
+                                <td className="py-2 px-4 border">{staff.salary}</td>
+                                <td className="py-2 px-4 border">
                                     <button onClick={() => toggleModal(staff)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
                                     <button onClick={() => handleDelete(staff._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
                                 </td>

@@ -78,29 +78,29 @@ const OrderList = () => {
                 <table className="min-w-full bg-white">
                     <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Customer ID</th>
-                        <th className="py-2 px-4 border-b">Staff ID</th>
-                        <th className="py-2 px-4 border-b">Order Date</th>
-                        <th className="py-2 px-4 border-b">Shipping Date</th>
-                        <th className="py-2 px-4 border-b">Form of Payment</th>
-                        <th className="py-2 px-4 border-b">Total Price</th>
-                        <th className="py-2 px-4 border-b">Status</th>
-                        <th className="py-2 px-4 border-b">Action</th>
+                        <th className="py-2 px-4 border">ID</th>
+                        <th className="py-2 px-4 border">Customer ID</th>
+                        <th className="py-2 px-4 border">Staff ID</th>
+                        <th className="py-2 px-4 border">Order Date</th>
+                        <th className="py-2 px-4 border">Shipping Date</th>
+                        <th className="py-2 px-4 border">Form of Payment</th>
+                        <th className="py-2 px-4 border">Total Price</th>
+                        <th className="py-2 px-4 border">Status</th>
+                        <th className="py-2 px-4 border">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     {orders.map((order) => (
                         <tr key={order._id}>
-                            <td className="py-2 px-4 border-b">{order._id}</td>
-                            <td className="py-2 px-4 border-b">{order.id_customer}</td>
-                            <td className="py-2 px-4 border-b">{order.id_staff}</td>
-                            <td className="py-2 px-4 border-b">{order.order_date}</td>
-                            <td className="py-2 px-4 border-b">{order.shipping_date}</td>
-                            <td className="py-2 px-4 border-b">{order.form_payment}</td>
-                            <td className="py-2 px-4 border-b">{order.total_price}</td>
-                            <td className="py-2 px-4 border-b">{order.status}</td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4 border">{order._id}</td>
+                            <td className="py-2 px-4 border">{order.id_customer}</td>
+                            <td className="py-2 px-4 border">{order.id_staff}</td>
+                            <td className="py-2 px-4 border">{order.order_date}</td>
+                            <td className="py-2 px-4 border">{order.shipping_date}</td>
+                            <td className="py-2 px-4 border">{order.form_payment}</td>
+                            <td className="py-2 px-4 border">{order.total_price}</td>
+                            <td className="py-2 px-4 border">{order.status}</td>
+                            <td className="py-2 px-4 border">
                                 <button onClick={() => toggleModal(order)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
                                 <button onClick={() => handleDelete(order._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
                             </td>

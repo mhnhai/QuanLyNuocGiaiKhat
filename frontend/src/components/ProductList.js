@@ -83,25 +83,25 @@ const ProductList = () => {
                 <table className="min-w-full bg-white">
                     <thead>
                     <tr>
-                        <th className="py-2 px-4 border-b">ID</th>
-                        <th className="py-2 px-4 border-b">Name</th>
-                        <th className="py-2 px-4 border-b">Category</th>
-                        <th className="py-2 px-4 border-b">Giá nhập</th>
-                        <th className="py-2 px-4 border-b">Giá bán</th>
-                        <th className="py-2 px-4 border-b">Stock</th>
-                        <th className="py-2 px-4 border-b">Action</th>
+                        <th className="py-2 px-4 border">ID</th>
+                        <th className="py-2 px-4 border">Name</th>
+                        <th className="py-2 px-4 border">Category</th>
+                        <th className="py-2 px-4 border">Giá nhập</th>
+                        <th className="py-2 px-4 border">Giá bán</th>
+                        <th className="py-2 px-4 border">Stock</th>
+                        <th className="py-2 px-4 border">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     {products.map((product) => (
                         <tr key={product._id}>
-                            <td className="py-2 px-4 border-b">{product._id}</td>
-                            <td className="py-2 px-4 border-b">{product.name}</td>
-                            <td className="py-2 px-4 border-b">{product.category}</td>
-                            <td className="py-2 px-4 border-b">{product.import_price}</td>
-                            <td className="py-2 px-4 border-b">{product.selling_price}</td>
-                            <td className="py-2 px-4 border-b">{product.stock}</td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4 border">{product._id}</td>
+                            <td className="py-2 px-4 border">{product.name}</td>
+                            <td className="py-2 px-4 border">{product.category}</td>
+                            <td className="py-2 px-4 border">{product.import_price}</td>
+                            <td className="py-2 px-4 border">{product.selling_price}</td>
+                            <td className="py-2 px-4 border">{product.stock}</td>
+                            <td className="py-2 px-4 border">
                                 <button onClick={() => openModal(product)}
                                         className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit
                                 </button>
