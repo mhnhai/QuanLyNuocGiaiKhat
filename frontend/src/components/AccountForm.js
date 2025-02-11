@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AccountService from "../services/account.service";
+import roleService from "../services/role.service";
 
 const AccountForm = ({ account, onSave }) => {
     const [formData, setFormData] = useState({
@@ -9,6 +10,16 @@ const AccountForm = ({ account, onSave }) => {
         role_account: '',
         address: ''
     });
+
+    const [roles, setRoles] = useState([]);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const rolesData = await roleService.getRoles();
+            setRoles(rolesData);
+        };
+        fetchRoles();
+    }, []);
 
     useEffect(() => {
         if (account) {
@@ -77,14 +88,18 @@ const AccountForm = ({ account, onSave }) => {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Role:</label>
-                    <input
-                        type="text"
+                    <select
                         name="role_account"
                         value={formData.role_account}
                         onChange={handleChange}
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
+                    >
+                        <option value="">Select Role</option>
+                        {roles.map((r) => (
+                            <option key={r.id} value={r.role}>{r.role}</option>
+                        ))}
+                    </select>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Address:</label>
