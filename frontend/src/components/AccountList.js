@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AccountService from "../services/account.service";
 import AccountForm from "./AccountForm";
 import Modal from "react-modal";
-
+import Button from "../components/Button";
 const AccountList = () => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -61,7 +61,7 @@ const AccountList = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Account List</h1>
-            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Account</button>
+            <Button onClick={toggleModal}>Add Account</Button>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}

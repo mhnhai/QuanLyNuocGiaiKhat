@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import OrderService from "../services/order.service";
 import ProductService from "../services/product.service";
+import statusService from "../services/status.service";
 
 const OrderForm = ({ order, onSave }) => {
     const [formData, setFormData] = useState(order || {
@@ -15,6 +16,7 @@ const OrderForm = ({ order, onSave }) => {
     });
 
     const [products, setProducts] = useState([]);
+    const [statuses, setStatuses] = useState([]);
 
     useEffect(() => {
         if (order) {
@@ -32,6 +34,15 @@ const OrderForm = ({ order, onSave }) => {
             }
         };
         fetchProducts();
+        const fetchStatuses = async () => {
+            try {
+                const statusesData = await statusService.getStatuses();
+                setStatuses(statusesData);
+            } catch (error) {
+                console.error('Error fetching statuses:', error);
+            }
+        };
+        fetchStatuses();
     }, []);
 
     const calculateTotalPrice = (orderItems) => {
@@ -47,7 +58,6 @@ const OrderForm = ({ order, onSave }) => {
             [name]: value
         });
     };
-
 
     const handleProductChange = (index, e) => {
         const { name, value } = e.target;
@@ -88,7 +98,6 @@ const OrderForm = ({ order, onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Update formData with the selling_price of each product
             const updatedOrderItems = formData.order_items.map(item => {
                 const product = products.find(p => p._id === item.id_product);
                 return {
@@ -126,6 +135,29 @@ const OrderForm = ({ order, onSave }) => {
         }
     };
 
+    const handleNextStatus = async () => {
+        if (window.confirm("Are you sure you want to move to the next status?")) {
+            const statusOrder = statuses;
+            const currentIndex = statusOrder.indexOf(formData.status);
+            if (currentIndex < statusOrder.length - 1) {
+                const nextStatus = statusOrder[currentIndex + 1];
+                setFormData({
+                    ...formData,
+                    status: nextStatus
+                });
+            }
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        if (window.confirm("Are you sure you want to cancel the order?")) {
+            setFormData({
+                ...formData,
+                status: "Đã hủy"
+            });
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-3">
@@ -139,16 +171,6 @@ const OrderForm = ({ order, onSave }) => {
                     <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
-                {/*<div>*/}
-                {/*    <label className="block text-sm font-medium text-gray-700">Order Date: {formData.order_date}</label>*/}
-                {/*    <input type="date" name="order_date" value={formData.order_date} onChange={handleChange} required*/}
-                {/*           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>*/}
-                {/*</div>*/}
-                {/*<div>*/}
-                {/*    <label className="block text-sm font-medium text-gray-700">Shipping Date: {formData.shipping_date}</label>*/}
-                {/*    <input type="date" name="shipping_date" value={formData.shipping_date} onChange={handleChange} required*/}
-                {/*           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>*/}
-                {/*</div>*/}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Form of Payment:</label>
                     <input type="text" name="form_payment" value={formData.form_payment} onChange={handleChange} required
@@ -188,6 +210,14 @@ const OrderForm = ({ order, onSave }) => {
             <button type="submit"
                     className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Order
             </button>
+            <button type="button" onClick={handleNextStatus} disabled={formData.status === "Đã hủy"}
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mt-2">Next Status
+            </button>
+            {formData.status === "Đã lên đơn" && (
+                <button type="button" onClick={handleCancelOrder}
+                        className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-2">Cancel Order
+                </button>
+            )}
         </form>
     );
 };
