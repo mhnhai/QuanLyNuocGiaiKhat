@@ -57,7 +57,6 @@ const SupplierList = () => {
             padding: '20px', // Add padding if needed
         },
     };
-
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Supplier List</h1>
@@ -90,7 +89,7 @@ const SupplierList = () => {
                         {suppliers.map((supplier) => (
                             <tr key={supplier._id}>
                                 <td className="py-2 px-4 border">{supplier._id}</td>
-                                <td className="py-2 px-4 border">{supplier.username}</td>
+                                <td className="py-2 px-4 border">{supplier.name}</td>
                                 <td className="py-2 px-4 border">{supplier.phone}</td>
                                 <td className="py-2 px-4 border">{supplier.role_supplier}</td>
                                 <td className="py-2 px-4 border">

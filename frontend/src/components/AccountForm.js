@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import AccountService from "../services/account.service";
 import roleService from "../services/role.service";
-import Button from "../components/Button";
+import {Button} from "./Button";
+
 const AccountForm = ({ account, onSave }) => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState( account || {
         username: '',
         password: '',
         phone: '',
@@ -14,18 +15,18 @@ const AccountForm = ({ account, onSave }) => {
     const [roles, setRoles] = useState([]);
 
     useEffect(() => {
-        const fetchRoles = async () => {
-            const rolesData = await roleService.getRoles();
-            setRoles(rolesData);
-        };
-        fetchRoles();
-    }, []);
-
-    useEffect(() => {
         if (account) {
             setFormData(account);
         }
     }, [account]);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const rolesData = await roleService.getRoles();
+            setRoles(rolesData);
+        }
+        fetchRoles();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -119,6 +120,8 @@ const AccountForm = ({ account, onSave }) => {
             >
                 Save Account
             </button>
+            <Button type="submit"/>
+
         </form>
     );
 };

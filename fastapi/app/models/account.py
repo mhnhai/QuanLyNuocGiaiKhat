@@ -6,8 +6,8 @@ class AccountModel(BaseModel):
     id: str = Field(alias="_id", default=None)
     username: str 
     password: str
-    role_account: str 
     phone: str 
+    role_account: str 
     address: str
     
     class Config:

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import AccountService from "../services/account.service";
 import AccountForm from "./AccountForm";
 import Modal from "react-modal";
-import Button from "../components/Button";
+import { Button, DeleteButton } from './Button';
+
 const AccountList = () => {
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -60,8 +61,9 @@ const AccountList = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Account List</h1>
-            <Button onClick={toggleModal}>Add Account</Button>
+            <h2 className="text-2xl font-bold mb-4">Account List</h2>
+            {/*nếu bị lỗi chưa có create mà lại hiện update là do toggleModal không có toggleModal()*/}
+            <Button onClick={() => toggleModal()}>Add Account</Button>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}
@@ -78,13 +80,13 @@ const AccountList = () => {
                 <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
                     <table className="min-w-full bg-white ">
                         <thead className="sticky top-0 bg-gray-400">
-                            <tr>
-                                <th className="py-2 px-4 border">ID</th>
-                                <th className="py-2 px-4 border">Name</th>
-                                <th className="py-2 px-4 border">Phone</th>
-                                <th className="py-2 px-4 border">Role</th>
-                                <th className="py-2 px-4 border">Action</th>
-                            </tr>
+                        <tr>
+                            <th className="py-2 px-4 border">ID</th>
+                            <th className="py-2 px-4 border">Name</th>
+                            <th className="py-2 px-4 border">Phone</th>
+                            <th className="py-2 px-4 border">Role</th>
+                            <th className="py-2 px-4 border">Action</th>
+                        </tr>
                         </thead>
                         <tbody>
                         {accounts.map((account) => (

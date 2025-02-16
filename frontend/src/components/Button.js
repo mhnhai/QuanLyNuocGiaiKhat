@@ -2,11 +2,12 @@ import React from "react";
 
 class Button extends React.Component {
     render() {
-        const { className, children, onClick } = this.props;
+        const { className, children, onClick, type } = this.props;
         return (
             <button
-                className={`mb-4 px-4 py-2 bg-black text-white rounded transition hover:bg-white hover:text-black hover:outline hover:outline-black ${className}`}
+                className={`px-4 py-2 bg-black text-white rounded-lg transition hover:bg-gray-700 ${className}`}
                 onClick={onClick}
+                type={type}
             >
                 {children}
             </button>
@@ -14,4 +15,34 @@ class Button extends React.Component {
     }
 }
 
-export default Button;
+class EditButton extends React.Component {
+    render() {
+        const { className, children, onClick, type } = this.props;
+        return (
+            <button
+                className={`px-4 py-2 bg-blue-600 text-white rounded-lg transition hover:bg-blue-700 ${className}`}
+                onClick={onClick}
+                type={type}
+            >
+                {children}
+            </button>
+        );
+    }
+}
+
+class DeleteButton extends React.Component {
+    render() {
+        const { className, children, onClick, type } = this.props;
+        return (
+            <button
+                className={`px-4 py-2 bg-red-600 text-white rounded-lg transition hover:bg-red-700 ${className}`}
+                onClick={onClick}
+                type={type}
+            >
+                {children}
+            </button>
+        );
+    }
+}
+
+export {Button,EditButton, DeleteButton};

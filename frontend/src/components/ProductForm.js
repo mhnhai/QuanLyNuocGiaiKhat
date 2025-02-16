@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductService from "../services/product.service";
 import SupplierService from "../services/supplier.service";
+import {Button} from "./Button";
 
 const ProductForm = ({ product, onSave }) => {
     const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const ProductForm = ({ product, onSave }) => {
         import_price: '',
         selling_price: '',
         category: '',
-        stock: '',
+        stock: 0,
         volume: '',
         origin: '',
         description: '',
@@ -83,13 +84,13 @@ const ProductForm = ({ product, onSave }) => {
                 </div>
                 <div className="col-span-1">
                     <label className="block text-sm font-medium text-gray-700">Giá nhập:</label>
-                    <input type="text" name="import_price" value={formData.import_price} onChange={handleChange}
+                    <input type="number" name="import_price" value={formData.import_price} onChange={handleChange}
                            required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Giá bán:</label>
-                    <input type="text" name="selling_price" value={formData.selling_price} onChange={handleChange}
+                    <input type="number" name="selling_price" value={formData.selling_price} onChange={handleChange}
                            required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300   rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
@@ -125,12 +126,11 @@ const ProductForm = ({ product, onSave }) => {
                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
             </div>
-            <button type="submit"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save
-                Product
-            </button>
+            <div className="flex justify-center">
+                <Button type="submit">Lưu</Button>
+            </div>
         </form>
     );
 };
 
-export default ProductForm ;
+export default ProductForm;
