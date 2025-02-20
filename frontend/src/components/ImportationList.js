@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import ImportationService from "../services/importation.service";
 import ImportationForm from "./ImportationForm";
 import Modal from "react-modal";
+import { Button, DeleteButton, EditButton } from "./Button";
+import SearchBar from "./SearchBar";
+import SupplierFilter from "./SupplierFilter";
 
 const ImportationList = () => {
     const [importations, setImportations] = useState([]);
@@ -10,22 +13,27 @@ const ImportationList = () => {
     const [selectedImportation, setSelectedImportation] = useState(null);
 
     useEffect(() => {
-        ImportationService.getAll()
-            .then((response) => {
-                setImportations(response.data);
-                setLoading(false);
-            })
-            .catch((e) => {
-                console.error(e);
-                setLoading(false);
-            });
+        fetchImportation();
     }, []);
+
+    const fetchImportation = async () => {
+        try {
+            const response = await ImportationService.getAll();
+            setImportations(response.data);
+            setLoading(false);
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async (id) => {
         try {
-            await ImportationService.delete(id);
-            setImportations(importations.filter((importation) => importation._id !== id));
-        } catch (error) {
+            if (window.confirm('Bạn có chắc muốn xóa đơn nhập này?')) {
+                await ImportationService.delete(id);
+                setImportations(importations.filter((importation) => importation._id !== id));
+            }
+        }catch (error) {
             console.error(error);
         }
     };
@@ -60,8 +68,10 @@ const ImportationList = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Importation List</h1>
-            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Importation</button>
+            <h1 className="text-2xl font-bold mb-4">Danh sách đơn nhập hàng</h1>
+            <div className="flex justify-between mb-4">
+                <Button onClick={() => toggleModal()} className="flex-initial">Tạo đơn nhập hàng</Button>
+            </div>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}

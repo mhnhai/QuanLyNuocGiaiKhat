@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
-import { FaBeer, FaUser, FaHome, FaCartPlus, FaCogs, FaUserTie, FaCartArrowDown  } from "react-icons/fa";
+import { FaBeer, FaUser, FaHome, FaCartPlus, FaCogs, FaUserTie, FaCartArrowDown, FaSignOutAlt } from "react-icons/fa";
+import Logout from "./Logout";
 
 const Sidebar = () => {
     return (
@@ -19,6 +19,7 @@ const Sidebar = () => {
                 <SidebarItem icon={<FaUser />} label="Nhà cung cấp" to="/suppliers" />
                 <SidebarItem icon={<FaCogs />} label="Cài đặt" to="/settings" />
             </nav>
+            <SidebarItem icon={<FaSignOutAlt />} label="Đăng xuất" to="/logout" />
         </div>
     );
 };

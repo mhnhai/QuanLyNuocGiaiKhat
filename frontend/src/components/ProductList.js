@@ -4,7 +4,7 @@ import ProductForm from "./ProductForm";
 import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
-import { IoMdAddCircleOutline } from "react-icons/io";
+import SupplierFilter from "./SupplierFilter";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -38,14 +38,9 @@ const ProductList = () => {
         }
     };
 
-    const openModal = (product = null) => {
+    const toggleModal = (product = null) => {
         setSelectedProduct(product);
         setModalIsOpen(!modalIsOpen);
-    };
-
-    const closeModal = () => {
-        setModalIsOpen(false);
-        setSelectedProduct(null);
     };
 
     const handleProductSave = (savedProduct) => {
@@ -59,7 +54,7 @@ const ProductList = () => {
                 return [...prevProducts, savedProduct];
             }
         });
-        closeModal();
+        toggleModal();
     };
 
     const handleSearch = (searchTerm) => {
@@ -67,6 +62,15 @@ const ProductList = () => {
             const filteredProducts = products.filter(product =>
                 product.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
+            setProducts(filteredProducts);
+        } else {
+            fetchProducts();
+        }
+    };
+
+    const handleFilter = (supplierId) => {
+        if (supplierId) {
+            const filteredProducts = products.filter(product => product.id_supplier === supplierId);
             setProducts(filteredProducts);
         } else {
             fetchProducts();
@@ -87,15 +91,16 @@ const ProductList = () => {
             <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <Button onClick={() => openModal()} className="flex-initial">Thêm sản phẩm</Button>
+                <SupplierFilter onFilter={handleFilter} />
+                <Button onClick={() => toggleModal()} className="flex-initial">Thêm sản phẩm</Button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
-                onRequestClose={closeModal}
+                onRequestClose={toggleModal}
                 style={modalStyles}
             >
                 <ProductForm product={selectedProduct} onSave={handleProductSave} />
-                <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Đóng</button>
+                <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Đóng</button>
             </Modal>
             {loading ? (
                 <p>Loading...</p>
@@ -120,7 +125,7 @@ const ProductList = () => {
                             <td className="py-2 px-4 border">{product.selling_price}</td>
                             <td className="py-2 px-4 border">{product.stock}</td>
                             <td className="py-2 px-4 border flex justify-center">
-                                <EditButton onClick={() => openModal(product)} className="mr-2">Edit</EditButton>
+                                <EditButton onClick={() => toggleModal(product)} className="mr-2">Edit</EditButton>
                                 <DeleteButton onClick={() => handleDelete(product._id)} className="">Delete</DeleteButton>
                             </td>
                         </tr>
