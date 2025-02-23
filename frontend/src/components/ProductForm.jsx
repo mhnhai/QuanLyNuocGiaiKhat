@@ -51,11 +51,11 @@ const ProductForm = ({ product, onSave }) => {
     };
 
     const handleSupplierChange = (e) => {
-        const selectedSupplier = suppliers.find(supplier => supplier.name === e.target.value);
+        const selectedSupplier = suppliers.find(supplier => supplier._id === e.target.value);
         setFormData({
             ...formData,
             id_supplier: selectedSupplier ? selectedSupplier._id : '',
-            supplier_name: e.target.value
+            supplier_name: selectedSupplier ? selectedSupplier.name : e.target.value
         });
     };
 
@@ -88,7 +88,7 @@ const ProductForm = ({ product, onSave }) => {
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                     <datalist id="suppliers">
                         {suppliers.map((supplier) => (
-                            <option key={supplier._id} value={supplier._id}>{supplier.name}</option>
+                            <option value={supplier._id}>{supplier.name}</option>
                         ))}
                     </datalist>
                     <input type="hidden" name="id_supplier" value={formData.id_supplier} />

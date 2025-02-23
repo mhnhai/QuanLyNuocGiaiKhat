@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import OrderService from "../services/order.service";
 import ProductService from "../services/product.service";
 import statusService from "../services/status.service";
+import formatDateTime from "../utils/formatDateTime";
+import { Button } from "./Button";
 
 const OrderForm = ({ order, onSave }) => {
     const [formData, setFormData] = useState(order || {
@@ -140,8 +142,6 @@ const OrderForm = ({ order, onSave }) => {
                 status: nextStatus
             });
         }
-        console.log(formData);
-
     };
 
     const handleCancelOrder = async () => {
@@ -151,33 +151,32 @@ const OrderForm = ({ order, onSave }) => {
                 status: "Đã hủy"
             });
         }
-
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3" >
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Customer ID:</label>
-                    <input type="text" name="id_customer" value={formData.id_customer} onChange={handleChange} required
+                    <input type="text" name="id_customer" value={formData.id_customer} onChange={handleChange} required disabled={!!order}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Staff ID:</label>
-                    <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
+                    <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required disabled={!!order}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày tạo đơn: {formData.order_date}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày tạo đơn: {formatDateTime(formData.order_date)}</label>
                     <input type="hidden" name="order_date" value={formData.order_date} />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển hàng: {formData.shipping_date}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển hàng: {formatDateTime(formData.shipping_date)}</label>
                     <input type="hidden" name="shipping_date" value={formData.shipping_date} />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Form of Payment:</label>
-                    <input type="text" name="form_payment" value={formData.form_payment} onChange={handleChange} required
+                    <input type="text" name="form_payment" value={formData.form_payment} onChange={handleChange} required disabled={!!order}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
@@ -198,6 +197,7 @@ const OrderForm = ({ order, onSave }) => {
                     <div key={index} className="grid grid-cols-4 gap-3 mb-2">
                         <select name="id_product" value={product.id_product}
                                 onChange={(e) => handleProductChange(index, e)} required
+                                disabled={!!order}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">Select Product</option>
                             {products.map((p) => (
@@ -205,23 +205,30 @@ const OrderForm = ({ order, onSave }) => {
                             ))}
                         </select>
                         <input type="number" name="quantity" value={product.quantity} onChange={(e) => handleProductChange(index, e)} required
+                               disabled={!!order}
                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Quantity" />
                         <input type="text" name="selling_price" value={product.selling_price} disabled
                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Selling Price" />
-                        <button type="button" onClick={() => removeProduct(index)} className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove</button>
+                        {!order && (
+                            <button type="button" onClick={() => removeProduct(index)} className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove</button>
+                        )}
                     </div>
                 ))}
-                <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Thêm sản phẩm</button>
+                {!order && (
+                    <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Thêm sản phẩm</button>
+                )}
             </div>
 
-                <button type="submit"
-                        className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Xác nhận
-                </button>
+            <Button type="submit"
+                    className="bg-indigo-600 hover:bg-indigo-700">Lưu
+            </Button>
 
-            <button type="button" onClick={handleNextStatus} disabled={formData.status === "Đã hủy"}
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mt-2">
-                {formData.status === "Đã hủy" ? "Order Cancelled" : `${statuses[statuses.indexOf(formData.status) + 1] || "N/A"}`}
-            </button>
+            {formData.status !== statuses[statuses.length - 1] && (
+                <Button type="button" onClick={handleNextStatus} disabled={formData.status === "Đã hủy"}
+                        className="bg-green-600 hover:bg-green-700">
+                    {formData.status === "Đã hủy" ? "Order Cancelled" : `${statuses[statuses.indexOf(formData.status) + 1] || "N/A"}`}
+                </Button>
+            )}
             {formData.status === statuses[0] && (
                 <button type="button" onClick={handleCancelOrder}
                         className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-2">Cancel Order
