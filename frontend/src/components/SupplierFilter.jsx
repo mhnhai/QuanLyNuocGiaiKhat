@@ -29,8 +29,6 @@ const SupplierFilter = ({ onFilter }) => {
         onFilter('');
     };
 
-    const selectedSupplierName = suppliers.find(supplier => supplier._id === selectedSupplier)?.name || 'All Suppliers';
-
     return (
         <div className="flex flex-col w-96">
             <div className="flex">
@@ -39,7 +37,7 @@ const SupplierFilter = ({ onFilter }) => {
                     onChange={handleChange}
                     className="flex-grow px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
-                    <option value="">All Suppliers</option>
+                    <option value="">Tất cả</option>
                     {suppliers.map((supplier) => (
                         <option key={supplier._id} value={supplier._id}>
                             {supplier.name}

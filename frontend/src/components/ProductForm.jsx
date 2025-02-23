@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ProductService from "../services/product.service";
 import SupplierService from "../services/supplier.service";
-import {Button} from "./Button";
+import { Button } from "./Button";
 
 const ProductForm = ({ product, onSave }) => {
     const [formData, setFormData] = useState({
         id_supplier: '',
+        supplier_name: '',
         name: '',
         import_price: '',
         selling_price: '',
@@ -16,9 +17,9 @@ const ProductForm = ({ product, onSave }) => {
         description: '',
     });
 
-    const categories = [   { key: 'barrel', name: 'Thùng' },
+    const categories = [
+        { key: 'barrel', name: 'Thùng' },
         { key: 'pack', name: 'Lốc 6 lon' },
-        // { key: 'case', name: 'Kết' },
     ];
 
     const [suppliers, setSuppliers] = useState([]);
@@ -49,6 +50,15 @@ const ProductForm = ({ product, onSave }) => {
         });
     };
 
+    const handleSupplierChange = (e) => {
+        const selectedSupplier = suppliers.find(supplier => supplier.name === e.target.value);
+        setFormData({
+            ...formData,
+            id_supplier: selectedSupplier ? selectedSupplier._id : '',
+            supplier_name: e.target.value
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -74,13 +84,14 @@ const ProductForm = ({ product, onSave }) => {
                 </div>
                 <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Tên nhà cung cấp:</label>
-                    <select name="id_supplier" value={formData.id_supplier} onChange={handleChange} required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="">-- Chọn nhà cung cấp --</option>
+                    <input type="text" name="supplier_name" list="suppliers" value={formData.supplier_name} onChange={handleSupplierChange} required
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <datalist id="suppliers">
                         {suppliers.map((supplier) => (
                             <option key={supplier._id} value={supplier._id}>{supplier.name}</option>
                         ))}
-                    </select>
+                    </datalist>
+                    <input type="hidden" name="id_supplier" value={formData.id_supplier} />
                 </div>
                 <div className="col-span-1">
                     <label className="block text-sm font-medium text-gray-700">Giá nhập:</label>
@@ -92,7 +103,7 @@ const ProductForm = ({ product, onSave }) => {
                     <label className="block text-sm font-medium text-gray-700">Giá bán:</label>
                     <input type="number" name="selling_price" value={formData.selling_price} onChange={handleChange}
                            required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300   rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Loại hàng:</label>

@@ -3,6 +3,7 @@ import OrderService from "../services/order.service";
 import OrderForm from "./OrderForm";
 import Modal from "react-modal";
 import formatDateTime from "../utils/formatDateTime";
+import {Button, DeleteButton, EditButton} from "./Button";
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -62,7 +63,7 @@ const OrderList = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Order List</h1>
-            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Order</button>
+            <Button onClick={() => toggleModal()} className="flex-initial">Tạo đơn hàng</Button>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}
@@ -80,9 +81,8 @@ const OrderList = () => {
                     <table className="min-w-full bg-white">
                         <thead className="sticky top-0 bg-gray-400">
                         <tr>
-                            <th className="py-2 px-4 border">ID</th>
-                            <th className="py-2 px-4 border">Customer ID</th>
-                            <th className="py-2 px-4 border">Staff ID</th>
+                            <th className="py-2 px-4 border">Customer</th>
+                            <th className="py-2 px-4 border">Staff</th>
                             <th className="py-2 px-4 border">Order Date</th>
                             <th className="py-2 px-4 border">Shipping Date</th>
                             <th className="py-2 px-4 border">Form of Payment</th>
@@ -94,7 +94,6 @@ const OrderList = () => {
                         <tbody>
                         {orders.map((order) => (
                             <tr key={order._id}>
-                                <td className="py-2 px-4 border">{order._id}</td>
                                 <td className="py-2 px-4 border">{order.id_customer}</td>
                                 <td className="py-2 px-4 border">{order.id_staff}</td>
                                 <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>
@@ -103,12 +102,12 @@ const OrderList = () => {
                                 <td className="py-2 px-4 border">{order.total_price}</td>
                                 <td className="py-2 px-4 border">{order.status}</td>
                                 <td className="py-2 px-4 border">
-                                    <button onClick={() => toggleModal(order)}
-                                            className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit
-                                    </button>
-                                    <button onClick={() => handleDelete(order._id)}
+                                    <EditButton onClick={() => toggleModal(order)}
+                                            >Edit
+                                    </EditButton>
+                                    <DeleteButton onClick={() => handleDelete(order._id)}
                                             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete
-                                    </button>
+                                    </DeleteButton>
                                 </td>
                             </tr>
                         ))}

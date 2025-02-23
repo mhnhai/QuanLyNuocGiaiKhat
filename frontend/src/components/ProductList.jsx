@@ -91,7 +91,8 @@ const ProductList = () => {
             <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <SupplierFilter onFilter={handleFilter} />
+                    <label>Lọc theo nhà phân phối:</label>
+                    <SupplierFilter onFilter={handleFilter}/>
                 <Button onClick={() => toggleModal()} className="flex-initial">Thêm sản phẩm</Button>
             </div>
             <Modal

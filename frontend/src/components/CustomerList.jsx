@@ -92,7 +92,7 @@ const CustomerList = () => {
                                 <td className="py-2 px-4 border">{customer.fullname}</td>
                                 <td className="py-2 px-4 border">{customer.address}</td>
                                 <td className="py-2 px-4 border">{customer.phone}</td>
-                                <td className="py-2 px-4 border">
+                                <td className="py-2 px-4 border flex justify-center">
                                     <button onClick={() => toggleModal(customer)}
                                             className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit
                                     </button>
