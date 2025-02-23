@@ -4,7 +4,6 @@ from app.database import importations_collection
 from app.models.importation import ImportationModel
 from bson import ObjectId
 import logging
-from datetime import datetime, date
 
 router = APIRouter()
 
@@ -42,11 +41,6 @@ async def create_importation(importation: ImportationModel):
     try:
         importation_dict = importation.dict(by_alias=True, exclude_unset=True)
         
-        # Convert datetime.date to datetime.datetime
-        if isinstance(importation_dict.get('import_date'), date):
-            importation_dict['import_date'] = datetime.combine(importation_dict['import_date'], datetime.min.time())
- 
-        
         if "_id" in importation_dict:
             del importation_dict["_id"]  # Ensure _id is not included in the document to let MongoDB generate it
         
@@ -64,11 +58,6 @@ async def update_importation(importation_id: str, importation: ImportationModel)
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
         
         importation_dict = importation.dict(by_alias=True, exclude_unset=True)
-        
-        # Convert datetime.date to datetime.datetime
-        if isinstance(importation_dict.get('import_date'), date):
-            importation_dict['import_date'] = datetime.combine(importation_dict['import_date'], datetime.min.time())
-
         
         if "_id" in importation_dict:
             del importation_dict["_id"]  # Remove the _id field from the update data

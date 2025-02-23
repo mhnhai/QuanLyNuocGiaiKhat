@@ -41,13 +41,7 @@ async def read_order(order_id: str):
 async def create_order(order: OrderModel):
     try:
         order_dict = order.dict(by_alias=True, exclude_unset=True)
-        
-        # Convert datetime.date to datetime.datetime
-        if isinstance(order_dict.get('order_date'), date):
-            order_dict['order_date'] = datetime.combine(order_dict['order_date'], datetime.min.time())
-        if isinstance(order_dict.get('shipping_date'), date):
-            order_dict['shipping_date'] = datetime.combine(order_dict['shipping_date'], datetime.min.time())
-        
+
         if "_id" in order_dict:
             del order_dict["_id"]  # Ensure _id is not included in the document to let MongoDB generate it
         
@@ -65,13 +59,7 @@ async def update_order(order_id: str, order: OrderModel):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
         
         order_dict = order.dict(by_alias=True, exclude_unset=True)
-        
-        # Convert datetime.date to datetime.datetime
-        if isinstance(order_dict.get('order_date'), date):
-            order_dict['order_date'] = datetime.combine(order_dict['order_date'], datetime.min.time())
-        if isinstance(order_dict.get('shipping_date'), date):
-            order_dict['shipping_date'] = datetime.combine(order_dict['shipping_date'], datetime.min.time())
-        
+
         if "_id" in order_dict:
             del order_dict["_id"]  # Remove the _id field from the update data
         

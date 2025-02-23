@@ -7,16 +7,16 @@ const OrderForm = ({ order, onSave }) => {
     const [formData, setFormData] = useState(order || {
         id_customer: '',
         id_staff: '',
-        order_date: '',
-        shipping_date: '',
+        order_date: new Date().toISOString(),
+        shipping_date: new Date().toISOString(),
         form_payment: '',
         total_price: '',
         status: '',
-        order_items: [{id_product: '', quantity: '', selling_price: ''}]
+        order_items: [{ id_product: '', quantity: '', selling_price: '' }]
     });
-
     const [products, setProducts] = useState([]);
     const [statuses, setStatuses] = useState([]);
+    const [showSaveButton, setShowSaveButton] = useState(!order);
 
     useEffect(() => {
         if (order) {
@@ -25,24 +25,19 @@ const OrderForm = ({ order, onSave }) => {
     }, [order]);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchData = async () => {
             try {
-                const response = await ProductService.getAll();
-                setProducts(response.data);
+                const [productsResponse, statusesResponse] = await Promise.all([
+                    ProductService.getAll(),
+                    statusService.getStatuses()
+                ]);
+                setProducts(productsResponse.data);
+                setStatuses(statusesResponse);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                console.error('Error fetching data:', error);
             }
         };
-        fetchProducts();
-        const fetchStatuses = async () => {
-            try {
-                const statusesData = await statusService.getStatuses();
-                setStatuses(statusesData);
-            } catch (error) {
-                console.error('Error fetching statuses:', error);
-            }
-        };
-        fetchStatuses();
+        fetchData();
     }, []);
 
     const calculateTotalPrice = (orderItems) => {
@@ -83,7 +78,7 @@ const OrderForm = ({ order, onSave }) => {
     const addProduct = () => {
         setFormData({
             ...formData,
-            order_items: [...formData.order_items, {id_product: '', quantity: '', selling_price: ''}]
+            order_items: [...formData.order_items, { id_product: '', quantity: '', selling_price: '' }]
         });
     };
 
@@ -108,13 +103,14 @@ const OrderForm = ({ order, onSave }) => {
 
             const updatedFormData = {
                 ...formData,
-                order_items: updatedOrderItems
+                order_items: updatedOrderItems,
             };
 
             let response;
-            if (order) {
+            if (order?._id) {
                 response = await OrderService.update(order._id, updatedFormData);
             } else {
+                updatedFormData.status = statuses[0];
                 response = await OrderService.create(updatedFormData);
             }
 
@@ -128,25 +124,24 @@ const OrderForm = ({ order, onSave }) => {
                     await ProductService.update(product._id, updatedProduct);
                 }
             }
-
             onSave(response.data);
+            setShowSaveButton(false);
         } catch (error) {
             console.error('Error saving order:', error);
         }
     };
 
     const handleNextStatus = async () => {
-        if (window.confirm("Are you sure you want to move to the next status?")) {
-            const statusOrder = statuses;
-            const currentIndex = statusOrder.indexOf(formData.status);
-            if (currentIndex < statusOrder.length - 1) {
-                const nextStatus = statusOrder[currentIndex + 1];
-                setFormData({
-                    ...formData,
-                    status: nextStatus
-                });
-            }
+        const currentIndex = statuses.indexOf(formData.status);
+        const nextStatus = statuses[currentIndex + 1];
+        if (nextStatus && window.confirm(`Xác nhận ${nextStatus}?`)) {
+            setFormData({
+                ...formData,
+                status: nextStatus
+            });
         }
+        console.log(formData);
+
     };
 
     const handleCancelOrder = async () => {
@@ -156,6 +151,7 @@ const OrderForm = ({ order, onSave }) => {
                 status: "Đã hủy"
             });
         }
+
     };
 
     return (
@@ -164,34 +160,44 @@ const OrderForm = ({ order, onSave }) => {
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Customer ID:</label>
                     <input type="text" name="id_customer" value={formData.id_customer} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Staff ID:</label>
                     <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Ngày tạo đơn: {formData.order_date}</label>
+                    <input type="hidden" name="order_date" value={formData.order_date} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển hàng: {formData.shipping_date}</label>
+                    <input type="hidden" name="shipping_date" value={formData.shipping_date} />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Form of Payment:</label>
                     <input type="text" name="form_payment" value={formData.form_payment} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Total Price:</label>
-                    <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled
+                           onChange={handleChange} required
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Status:</label>
-                    <input type="text" name="status" value={formData.status} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <input type="text" name="status" value={formData.status} onChange={handleChange} disabled
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
             </div>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Products:</label>
                 {formData.order_items.map((product, index) => (
                     <div key={index} className="grid grid-cols-4 gap-3 mb-2">
-                        <select name="id_product" value={product.id_product} onChange={(e) => handleProductChange(index, e)} required
+                        <select name="id_product" value={product.id_product}
+                                onChange={(e) => handleProductChange(index, e)} required
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">Select Product</option>
                             {products.map((p) => (
@@ -199,21 +205,24 @@ const OrderForm = ({ order, onSave }) => {
                             ))}
                         </select>
                         <input type="number" name="quantity" value={product.quantity} onChange={(e) => handleProductChange(index, e)} required
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Quantity"/>
+                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Quantity" />
                         <input type="text" name="selling_price" value={product.selling_price} disabled
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Selling Price"/>
+                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Selling Price" />
                         <button type="button" onClick={() => removeProduct(index)} className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove</button>
                     </div>
                 ))}
-                <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product</button>
+                <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Thêm sản phẩm</button>
             </div>
-            <button type="submit"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Order
-            </button>
+
+                <button type="submit"
+                        className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Xác nhận
+                </button>
+
             <button type="button" onClick={handleNextStatus} disabled={formData.status === "Đã hủy"}
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mt-2">Next Status
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 mt-2">
+                {formData.status === "Đã hủy" ? "Order Cancelled" : `${statuses[statuses.indexOf(formData.status) + 1] || "N/A"}`}
             </button>
-            {formData.status === "Đã lên đơn" && (
+            {formData.status === statuses[0] && (
                 <button type="button" onClick={handleCancelOrder}
                         className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 mt-2">Cancel Order
                 </button>

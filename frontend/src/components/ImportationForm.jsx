@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import ImportationService from "../services/importation.service";
 import ProductService from "../services/product.service";
+import formatDateTime from "../utils/formatDateTime";
 
 const ImportationForm = ({ importation, onSave }) => {
+    // mai xử lí làm sao để lấy được import_date là date
     const [formData, setFormData] = useState(importation || {
         id_supplier: '',
         id_staff: '',
-        import_date: '',
+        import_date: new Date().toISOString(),
         total_price: '',
         import_items: [{id_product: '', quantity: '', import_price: ''}]
     });
-
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
@@ -96,7 +97,6 @@ const ImportationForm = ({ importation, onSave }) => {
                 ...formData,
                 import_items: updatedImportItems
             };
-
             let response;
             if (importation) {
                 response = await ImportationService.update(importation._id, updatedFormData);
@@ -114,13 +114,11 @@ const ImportationForm = ({ importation, onSave }) => {
                     await ProductService.update(product._id, updatedProduct);
                 }
             }
-
             onSave(response.data);
         } catch (error) {
             console.error('Error saving importation:', error);
         }
     };
-
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-3">
@@ -135,13 +133,12 @@ const ImportationForm = ({ importation, onSave }) => {
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Import Date:</label>
-                    <input type="date" name="import_date" value={formData.import_date} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <label className="block text-sm font-medium text-gray-700">Import Date:{formatDateTime(formData.import_date)}</label>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Total Price:</label>
-                    <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled onChange={handleChange} required
+                    <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled
+                           onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
             </div>

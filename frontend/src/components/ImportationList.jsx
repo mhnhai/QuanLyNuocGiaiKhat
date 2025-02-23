@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
 import SupplierFilter from "./SupplierFilter";
+import formatDateTime from "../utils/formatDateTime";
 
 const ImportationList = () => {
     const [importations, setImportations] = useState([]);
@@ -103,7 +104,7 @@ const ImportationList = () => {
                                 <td className="py-2 px-4 border">{importation._id}</td>
                                 <td className="py-2 px-4 border">{importation.id_supplier}</td>
                                 <td className="py-2 px-4 border">{importation.id_staff}</td>
-                                <td className="py-2 px-4 border">{importation.import_date}</td>
+                                <td className="py-2 px-4 border">{formatDateTime(importation.import_date)}</td>
                                 <td className="py-2 px-4 border">{importation.total_price}</td>
                                 <td className="py-2 px-4 border">
                                     <button onClick={() => toggleModal(importation)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>

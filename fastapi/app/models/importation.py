@@ -1,14 +1,14 @@
 from pydantic import BaseModel, Field
 from typing import List
 from bson import ObjectId
-from datetime import date
+from datetime import datetime
 from .importitem import ImportItem
 
 class ImportationModel(BaseModel):
     id: str = Field(alias="_id", default=None)
     id_supplier: str
     id_staff: str
-    # import_date: date
+    import_date: datetime
     total_price: float
     import_items: List[ImportItem]
 
@@ -17,5 +17,4 @@ class ImportationModel(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str,
-            date: lambda v: v.strftime("%d-%m-%Y")
         }

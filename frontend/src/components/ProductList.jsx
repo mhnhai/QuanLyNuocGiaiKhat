@@ -105,33 +105,37 @@ const ProductList = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <table className="min-w-full bg-white mt-4">
-                    <thead>
-                    <tr>
-                        <th className="py-2 px-4 border w-2/12">Tên sản phẩm</th>
-                        <th className="py-2 px-4 border w-1/12">Loại</th>
-                        <th className="py-2 px-4 border w-1/12">Giá nhập</th>
-                        <th className="py-2 px-4 border w-1/12">Giá bán</th>
-                        <th className="py-2 px-4 border w-1/12">Tồn kho</th>
-                        <th className="py-2 px-4 border w-1/6">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {products.map((product) => (
-                        <tr key={product._id}>
-                            <td className="py-2 px-4 border">{product.name}</td>
-                            <td className="py-2 px-4 border">{product.category}</td>
-                            <td className="py-2 px-4 border">{product.import_price}</td>
-                            <td className="py-2 px-4 border">{product.selling_price}</td>
-                            <td className="py-2 px-4 border">{product.stock}</td>
-                            <td className="py-2 px-4 border flex justify-center">
-                                <EditButton onClick={() => toggleModal(product)} className="mr-2">Edit</EditButton>
-                                <DeleteButton onClick={() => handleDelete(product._id)} className="">Delete</DeleteButton>
-                            </td>
+                <div className="overflow-auto" style={{maxHeight: '72vh'}}>
+                    <table className="min-w-full bg-white">
+                        <thead className="sticky top-0 bg-white">
+                        <tr>
+                            <th className="py-2 px-4 border w-2/12">Tên sản phẩm</th>
+                            <th className="py-2 px-4 border w-1/12">Loại</th>
+                            <th className="py-2 px-4 border w-1/12">Giá nhập</th>
+                            <th className="py-2 px-4 border w-1/12">Giá bán</th>
+                            <th className="py-2 px-4 border w-1/12">Tồn kho</th>
+                            <th className="py-2 px-4 border w-1/6">Hành động</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {products.map((product) => (
+                            <tr key={product._id}>
+                                <td className="py-2 px-4 border">{product.name}</td>
+                                <td className="py-2 px-4 border">{product.category}</td>
+                                <td className="py-2 px-4 border">{product.import_price}</td>
+                                <td className="py-2 px-4 border">{product.selling_price}</td>
+                                <td className="py-2 px-4 border">{product.stock}</td>
+                                <td className="py-2 px-4 border flex justify-center">
+                                    <EditButton onClick={() => toggleModal(product)} className="mr-2">Edit</EditButton>
+                                    <DeleteButton onClick={() => handleDelete(product._id)}
+                                                  className="">Delete</DeleteButton>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+
             )}
         </div>
     );
