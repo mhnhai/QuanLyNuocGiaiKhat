@@ -18,7 +18,6 @@ const OrderForm = ({ order, onSave }) => {
     });
     const [products, setProducts] = useState([]);
     const [statuses, setStatuses] = useState([]);
-    const [showSaveButton, setShowSaveButton] = useState(!order);
 
     useEffect(() => {
         if (order) {
@@ -127,7 +126,6 @@ const OrderForm = ({ order, onSave }) => {
                 }
             }
             onSave(response.data);
-            setShowSaveButton(false);
         } catch (error) {
             console.error('Error saving order:', error);
         }
