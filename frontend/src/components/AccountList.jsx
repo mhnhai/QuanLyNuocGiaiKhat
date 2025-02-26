@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import AccountService from "../services/account.service";
 import AccountForm from "./AccountForm";
 import Modal from "react-modal";
-import { Button, DeleteButton } from './Button';
+import { Button, DeleteButton, EditButton } from "./Button";
+import SearchBar from "./SearchBar";
 
 const AccountList = () => {
     const [accounts, setAccounts] = useState([]);
@@ -11,22 +12,27 @@ const AccountList = () => {
     const [selectedAccount, setSelectedAccount] = useState(null);
 
     useEffect(() => {
-        AccountService.getAll()
-            .then((response) => {
-                setAccounts(response.data);
-                setLoading(false);
-            })
-            .catch((e) => {
-                console.error(e);
-                setLoading(false);
-            });
+        fetchAccounts();
     }, []);
+
+    const fetchAccounts = async () => {
+        try {
+            const response = await AccountService.getAll();
+            setAccounts(response.data);
+            setLoading(false);
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async (id) => {
         try {
-            await AccountService.delete(id);
-            setAccounts(accounts.filter((account) => account._id !== id));
-        } catch (error) {
+            if (window.confirm('Bạn có chắc muốn xóa khách hàng này?')) {
+                await AccountService.delete(id);
+                setAccounts(accounts.filter((account) => account._id !== id));
+            }
+        }catch (error) {
             console.error(error);
         }
     };
@@ -48,6 +54,17 @@ const AccountList = () => {
             }
         });
         toggleModal();
+    };
+
+    const handleSearch = (searchTerm) => {
+        if (searchTerm) {
+            const filteredProducts = accounts.filter(account =>
+                account.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setAccounts(filteredProducts);
+        } else {
+            fetchAccounts();
+        }
     };
 
     const modalStyles = {

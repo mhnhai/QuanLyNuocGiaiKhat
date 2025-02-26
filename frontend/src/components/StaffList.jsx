@@ -2,17 +2,22 @@ import React, { useState, useEffect } from "react";
 import StaffService from "../services/staff.service";
 import StaffForm from "./StaffForm";
 import Modal from "react-modal";
+import {Button, DeleteButton, EditButton} from "./Button";
+import searchBar from "./SearchBar";
+import SearchBar from "./SearchBar";
 
 const StaffList = () => {
     const [staffs, setStaffs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(null);
+    const [originalStaffs, setOriginalStaffs] = useState([]);
 
     useEffect(() => {
         StaffService.getAll()
             .then((response) => {
                 setStaffs(response.data);
+                setOriginalStaffs(response.data);
                 setLoading(false);
             })
             .catch((e) => {
@@ -49,26 +54,41 @@ const StaffList = () => {
         toggleModal();
     };
 
+    const handleSearch = (searchTerm) => {
+        if (!searchTerm) {
+            setStaffs(originalStaffs);
+            return;
+        }
+        const filteredProducts = originalStaffs.filter(staff =>
+            staff.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setStaffs(filteredProducts);
+    };
+
+
     const modalStyles = {
         content: {
             width: '50%',
-            height: '80%',
+            height: '60%',
             margin: 'auto',
             padding: '20px',
         },
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container pt-4">
             <h1 className="text-2xl font-bold mb-4">Staff List</h1>
-            <button onClick={() => toggleModal()} className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Staff</button>
+            <div className="flex justify-between items-center mb-4">
+                <SearchBar onSearch={handleSearch} className="flex-1"/>
+                <Button onClick={() => toggleModal()} className="flex-initial">Thêm nhân viên</Button>
+            </div>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}
                 style={modalStyles}
             >
                 <div>
-                    <StaffForm staff={selectedStaff} onSave={handleStaffSave} />
+                    <StaffForm staff={selectedStaff} onSave={handleStaffSave}/>
                     <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Close</button>
                 </div>
             </Modal>
@@ -79,7 +99,6 @@ const StaffList = () => {
                     <table className="min-w-full bg-white">
                         <thead className="sticky top-0 bg-white">
                         <tr>
-                            <th className="py-2 px-4 border">ID</th>
                             <th className="py-2 px-4 border">Name</th>
                             <th className="py-2 px-4 border">position</th>
                             <th className="py-2 px-4 border">salary</th>
@@ -89,13 +108,12 @@ const StaffList = () => {
                         <tbody>
                         {staffs.map((staff) => (
                             <tr key={staff._id}>
-                                <td className="py-2 px-4 border">{staff._id}</td>
                                 <td className="py-2 px-4 border">{staff.name}</td>
                                 <td className="py-2 px-4 border">{staff.position}</td>
                                 <td className="py-2 px-4 border">{staff.salary}</td>
                                 <td className="py-2 px-4 border">
-                                    <button onClick={() => toggleModal(staff)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
-                                    <button onClick={() => handleDelete(staff._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
+                                    <EditButton onClick={() => toggleModal(staff)}>Edit</EditButton>
+                                    <DeleteButton onClick={() => handleDelete(staff._id)}>Delete</DeleteButton>
                                 </td>
                             </tr>
                         ))}

@@ -1,4 +1,4 @@
-roles = [
-    {'Tiền mặt'},
-    {'Chuyển khoản'},
+payment_forms = [
+    'Tiền mặt',
+    'Chuyển khoản',
 ]

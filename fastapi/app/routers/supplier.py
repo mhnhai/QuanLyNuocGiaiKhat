@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from app.database import suppliers_collection
+from pydantic import ValidationError
 from app.models.supplier import SupplierModel
 from bson import ObjectId
 import logging
@@ -45,6 +46,9 @@ async def create_supplier(supplier: SupplierModel):
         result = await suppliers_collection.insert_one(supplier_dict)
         supplier_dict["_id"] = str(result.inserted_id)
         return SupplierModel(**supplier_dict)
+    except ValidationError as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(status_code=422, detail=e.errors())
     except Exception as e:
         logger.error(f"Error creating supplier: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

@@ -2,17 +2,22 @@ import React, { useEffect, useState } from 'react';
 import ImportationService from "../services/importation.service";
 import ProductService from "../services/product.service";
 import formatDateTime from "../utils/formatDateTime";
+import SupplierService from "../services/supplier.service";
+import Select from 'react-select';
+import { FaDeleteLeft } from "react-icons/fa6";
+import { Button, DeleteButton, EditButton } from "./Button";
+import { IoMdClose } from "react-icons/io";
 
-const ImportationForm = ({ importation, onSave }) => {
-    // mai xử lí làm sao để lấy được import_date là date
+const ImportationForm = ({ importation, onSave, onClose }) => {
     const [formData, setFormData] = useState(importation || {
         id_supplier: '',
         id_staff: '',
         import_date: new Date().toISOString(),
         total_price: '',
-        import_items: [{id_product: '', quantity: '', import_price: ''}]
+        import_items: [{ id_product: '', quantity: '', import_price: '' }]
     });
     const [products, setProducts] = useState([]);
+    const [suppliers, setSuppliers] = useState([]);
 
     useEffect(() => {
         if (importation) {
@@ -24,12 +29,29 @@ const ImportationForm = ({ importation, onSave }) => {
         const fetchProducts = async () => {
             try {
                 const response = await ProductService.getAll();
-                setProducts(response.data);
+                setProducts(response.data.map(product => ({
+                    value: product._id,
+                    label: product.name,
+                    import_price: product.import_price
+                })));
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
         };
         fetchProducts();
+
+        const fetchSuppliers = async () => {
+            try {
+                const response = await SupplierService.getAll();
+                setSuppliers(response.data.map(supplier => ({
+                    value: supplier._id,
+                    label: supplier.name
+                })));
+            } catch (error) {
+                console.error('Error fetching suppliers:', error);
+            }
+        };
+        fetchSuppliers();
     }, []);
 
     const calculateTotalPrice = (importItems) => {
@@ -67,10 +89,26 @@ const ImportationForm = ({ importation, onSave }) => {
         });
     };
 
+    const handleQuantityChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedProducts = formData.import_items.map((product, i) => {
+            if (i === index) {
+                return { ...product, [name]: value };
+            }
+            return product;
+        });
+        const totalPrice = calculateTotalPrice(updatedProducts);
+        setFormData({
+            ...formData,
+            import_items: updatedProducts,
+            total_price: totalPrice
+        });
+    };
+
     const addProduct = () => {
         setFormData({
             ...formData,
-            import_items: [...formData.import_items, {id_product: '', quantity: '', import_price: ''}]
+            import_items: [...formData.import_items, { id_product: '', quantity: '', import_price: '' }]
         });
     };
 
@@ -86,7 +124,7 @@ const ImportationForm = ({ importation, onSave }) => {
         e.preventDefault();
         try {
             const updatedImportItems = formData.import_items.map(item => {
-                const product = products.find(p => p._id === item.id_product);
+                const product = products.find(p => p.value === item.id_product);
                 return {
                     ...item,
                     import_price: product ? product.import_price : item.import_price
@@ -105,13 +143,13 @@ const ImportationForm = ({ importation, onSave }) => {
             }
 
             for (const item of updatedImportItems) {
-                const product = products.find(p => p._id === item.id_product);
+                const product = products.find(p => p.value === item.id_product);
                 if (product) {
                     const updatedProduct = {
                         ...product,
                         stock: product.stock + parseInt(item.quantity, 10)
                     };
-                    await ProductService.update(product._id, updatedProduct);
+                    await ProductService.update(product.value, updatedProduct);
                 }
             }
             onSave(response.data);
@@ -119,51 +157,75 @@ const ImportationForm = ({ importation, onSave }) => {
             console.error('Error saving importation:', error);
         }
     };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex justify-end">
+                <Button onClick={onClose} type="button">
+                    <IoMdClose size={24} />
+                </Button>
+            </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Supplier ID:</label>
-                    <input type="text" name="id_supplier" value={formData.id_supplier} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <label className="block text-sm font-medium text-gray-700">Supplier:</label>
+                    <Select
+                        value={suppliers.find(option => option.value === formData.id_supplier)}
+                        onChange={(selectedOption) => setFormData({
+                            ...formData,
+                            id_supplier: selectedOption ? selectedOption.value : ''
+                        })}
+                        options={suppliers}
+                        className="mt-1 block w-full"
+                        placeholder="-- Chọn nhà cung cấp --"
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Staff ID:</label>
                     <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Import Date:{formatDateTime(formData.import_date)}</label>
+                    <label className="block text-sm font-medium text-gray-700">Import Date:</label>
+                    <input type="date" name="import_date" value={formData.import_date.split('T')[0]} onChange={handleChange} required
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Total Price:</label>
                     <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled
                            onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
             </div>
             <div>
                 <label className="block text-sm font-medium text-gray-700">Products:</label>
                 {formData.import_items.map((product, index) => (
                     <div key={index} className="grid grid-cols-4 gap-3 mb-2">
-                        <select name="id_product" value={product.id_product} onChange={(e) => handleProductChange(index, e)} required
+                        <select name="id_product" value={product.id_product}
+                                onChange={(e) => handleProductChange(index, e)} required
+                                disabled={!!importation}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">Select Product</option>
+                            <option value="">--Sản phẩm--</option>
                             {products.map((p) => (
                                 <option key={p._id} value={p._id}>{p.name}</option>
                             ))}
                         </select>
-                        <input type="number" name="quantity" value={product.quantity} onChange={(e) => handleProductChange(index, e)} required
+                        <input type="number" name="quantity" value={product.quantity}
+                               onChange={(e) => handleProductChange(index, e)} required
                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                         <input type="text" name="import_price" value={product.import_price} disabled
                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
-                        <button type="button" onClick={() => removeProduct(index)} className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove</button>
+                        <button type="button" onClick={() => removeProduct(index)}
+                                className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove
+                        </button>
                     </div>
                 ))}
-                <button type="button" onClick={addProduct} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product</button>
+                <button type="button" onClick={addProduct}
+                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product
+                </button>
             </div>
             <button type="submit"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save Importation
+                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save
+                Importation
             </button>
         </form>
     );

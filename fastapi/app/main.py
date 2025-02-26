@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import account, customer, item, staff, product, supplier, order, importation, role_account, status_order, revenue
+from app.routers import account, customer, item, staff, product, supplier, order, importation, role_account, status_order, revenue, payment_form, position
     
 origins =[
     "http://localhost:3000",
@@ -28,6 +28,9 @@ app.include_router(importation.router, prefix="/api")
 app.include_router(role_account.router, prefix="/api")
 app.include_router(status_order.router, prefix="/api")
 app.include_router(revenue.router, prefix="/api")
+app.include_router(payment_form.router, prefix="/api")
+app.include_router(position.router, prefix="/api")
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}

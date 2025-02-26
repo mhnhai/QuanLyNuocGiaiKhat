@@ -7,8 +7,8 @@ class SupplierModel(BaseModel):
     name: str
     email: str
     address: str
-    phone: str
-    
+    phone: str = Field(..., min_length=10, max_length=10)
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True

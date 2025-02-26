@@ -8,6 +8,11 @@ class StaffModel(BaseModel):
     name: str
     position: str
     # birth_date: date 
+    username: str 
+    password: str
+    phone: str = Field(..., min_length=10, max_length=10)
+    role_account: str 
+    address: str
     salary: float 
     
     class Config:

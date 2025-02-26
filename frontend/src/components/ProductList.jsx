@@ -11,6 +11,7 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [originalProducts, setOriginalProducts] = useState([]);
 
     useEffect(() => {
         fetchProducts();
@@ -20,6 +21,7 @@ const ProductList = () => {
         try {
             const response = await ProductService.getAll();
             setProducts(response.data);
+            setOriginalProducts(response.data); // Lưu danh sách gốc để không bị mất khi tìm kiếm
             setLoading(false);
         } catch (e) {
             console.error(e);
@@ -29,7 +31,7 @@ const ProductList = () => {
 
     const handleDelete = async (id) => {
         try {
-            if (window.confirm('Are you sure you want to delete this product?')) {
+            if (window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
                 await ProductService.delete(id);
                 setProducts(products.filter((product) => product._id !== id));
             }
@@ -58,35 +60,40 @@ const ProductList = () => {
     };
 
     const handleSearch = (searchTerm) => {
-        if (searchTerm) {
-            const filteredProducts = products.filter(product =>
-                product.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setProducts(filteredProducts);
-        } else {
-            fetchProducts();
+        if (!searchTerm) {
+            setProducts(originalProducts); // Nếu search rỗng, hiển thị lại danh sách gốc
+            return;
         }
+
+        const filteredProducts = originalProducts.filter(product =>
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setProducts(filteredProducts);
     };
 
     const handleFilter = (supplierId) => {
-        if (supplierId) {
-            const filteredProducts = products.filter(product => product.id_supplier === supplierId);
-            setProducts(filteredProducts);
-        } else {
-            fetchProducts();
+        if (!supplierId) {
+            setProducts(originalProducts); //
+            // Nếu bỏ chọn filter, hiển thị lại danh sách gốc
+            return;
         }
+
+        const filteredProducts = originalProducts.filter(product => product.id_supplier === supplierId);
+        setProducts(filteredProducts);
     };
+
 
     const modalStyles = {
         content: {
             width: '50%',
-            height: '80%',
+            height: '45%',
             margin: 'auto',
             padding: '20px',
         },
     };
 
     return (
+
         <div className="container pt-4">
             <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <div className="flex justify-between items-center mb-4">

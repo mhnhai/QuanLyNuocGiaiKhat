@@ -15,7 +15,7 @@ const SearchBar = ({ onSearch }) => {
                 type="text"
                 value={searchTerm}
                 onChange={handleChange}
-                placeholder="Search products..."
+                placeholder="Tìm kiếm..."
                 className="flex-grow px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
         </div>

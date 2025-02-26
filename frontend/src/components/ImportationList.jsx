@@ -3,29 +3,46 @@ import ImportationService from "../services/importation.service";
 import ImportationForm from "./ImportationForm";
 import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
-import SearchBar from "./SearchBar";
-import SupplierFilter from "./SupplierFilter";
+import SupplierService from "../services/supplier.service";
 import formatDateTime from "../utils/formatDateTime";
+import DateFilter from "./DateFilter";
 
 const ImportationList = () => {
     const [importations, setImportations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedImportation, setSelectedImportation] = useState(null);
+    const [supplierNames, setSupplierNames] = useState({});
+    const [originalImportations, setOriginalImportations] = useState([]);
 
     useEffect(() => {
-        fetchImportation();
+        ImportationService.getAll()
+            .then((response) => {
+                setImportations(response.data);
+                setOriginalImportations(response.data)
+                setLoading(false);
+                fetchSupplierNames(response.data);
+            })
+            .catch((e) => {
+                console.error(e);
+                setLoading(false);
+            });
     }, []);
 
-    const fetchImportation = async () => {
-        try {
-            const response = await ImportationService.getAll();
-            setImportations(response.data);
-            setLoading(false);
-        } catch (e) {
-            console.error(e);
-            setLoading(false);
+
+    const fetchSupplierNames = async (importations) => {
+        const names = {};
+        for (const importation of importations) {
+            if (importation.id_supplier && !names[importation.id_supplier]) {
+                try {
+                    const response = await SupplierService.getById(importation.id_supplier);
+                    names[importation.id_supplier] = response.data.name;
+                } catch (error) {
+                    console.error(`Error fetching customer with id ${importation.id_customer}:`, error);
+                }
+            }
         }
+        setSupplierNames(names);
     };
 
     const handleDelete = async (id) => {
@@ -58,6 +75,17 @@ const ImportationList = () => {
         toggleModal();
     };
 
+    const handleDateFilter = (date) => {
+        if (date) {
+            const filteredImportations = originalImportations.filter(importation =>
+                importation.import_date.startsWith(date)
+            );
+            setImportations(filteredImportations);
+        } else {
+            setImportations(originalImportations);
+        }
+    };
+
     const modalStyles = {
         content: {
             width: '50%',
@@ -68,9 +96,13 @@ const ImportationList = () => {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container pt-4">
             <h1 className="text-2xl font-bold mb-4">Danh sách đơn nhập hàng</h1>
             <div className="flex justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                    <span>Lọc theo ngày:</span>
+                    <DateFilter onFilter={handleDateFilter}/>
+                </div>
                 <Button onClick={() => toggleModal()} className="flex-initial">Tạo đơn nhập hàng</Button>
             </div>
             <Modal
@@ -79,8 +111,7 @@ const ImportationList = () => {
                 style={modalStyles}
             >
                 <div>
-                    <ImportationForm importation={selectedImportation} onSave={handleImportationSave} />
-                    <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Close</button>
+                    <ImportationForm importation={selectedImportation} onSave={handleImportationSave} onClose={toggleModal} />
                 </div>
             </Modal>
             {loading ? (
@@ -90,9 +121,7 @@ const ImportationList = () => {
                     <table className="min-w-full bg-white">
                         <thead className="sticky top-0 bg-white">
                         <tr>
-                            <th className="py-2 px-4 border">ID</th>
-                            <th className="py-2 px-4 border">Supplier ID</th>
-                            <th className="py-2 px-4 border">Staff ID</th>
+                            <th className="py-2 px-4 border">Tên nhà cung cấp</th>
                             <th className="py-2 px-4 border">Import Date</th>
                             <th className="py-2 px-4 border">Total Price</th>
                             <th className="py-2 px-4 border">Action</th>
@@ -101,14 +130,12 @@ const ImportationList = () => {
                         <tbody>
                         {importations.map((importation) => (
                             <tr key={importation._id}>
-                                <td className="py-2 px-4 border">{importation._id}</td>
-                                <td className="py-2 px-4 border">{importation.id_supplier}</td>
-                                <td className="py-2 px-4 border">{importation.id_staff}</td>
+                                <td className="py-2 px-4 border">{supplierNames[importation.id_supplier]}</td>
                                 <td className="py-2 px-4 border">{formatDateTime(importation.import_date)}</td>
                                 <td className="py-2 px-4 border">{importation.total_price}</td>
-                                <td className="py-2 px-4 border">
-                                    <button onClick={() => toggleModal(importation)} className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700">Edit</button>
-                                    <button onClick={() => handleDelete(importation._id)} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</button>
+                                <td className="py-2 px-4 border flex justify-center">
+                                    <EditButton onClick={() => toggleModal(importation)}>Edit</EditButton>
+                                    <DeleteButton onClick={() => handleDelete(importation._id)}>Delete</DeleteButton>
                                 </td>
                             </tr>
                         ))}
