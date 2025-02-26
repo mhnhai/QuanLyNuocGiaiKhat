@@ -133,10 +133,12 @@ const ProductList = () => {
                                 <td className="py-2 px-4 border">{product.import_price}</td>
                                 <td className="py-2 px-4 border">{product.selling_price}</td>
                                 <td className="py-2 px-4 border">{product.stock}</td>
-                                <td className="py-2 px-4 border flex justify-center">
-                                    <EditButton onClick={() => toggleModal(product)} className="mr-2">Edit</EditButton>
-                                    <DeleteButton onClick={() => handleDelete(product._id)}
-                                                  className="">Delete</DeleteButton>
+                                <td className="py-2 px-4 border">
+                                    <div className="flex justify-center">
+                                        <EditButton onClick={() => toggleModal(product)} className="mr-2">Edit</EditButton>
+                                        <DeleteButton onClick={() => handleDelete(product._id)}
+                                                      className="">Delete</DeleteButton>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

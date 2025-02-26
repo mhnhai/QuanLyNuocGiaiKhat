@@ -133,9 +133,13 @@ const ImportationList = () => {
                                 <td className="py-2 px-4 border">{supplierNames[importation.id_supplier]}</td>
                                 <td className="py-2 px-4 border">{formatDateTime(importation.import_date)}</td>
                                 <td className="py-2 px-4 border">{importation.total_price}</td>
-                                <td className="py-2 px-4 border flex justify-center">
-                                    <EditButton onClick={() => toggleModal(importation)}>Edit</EditButton>
-                                    <DeleteButton onClick={() => handleDelete(importation._id)}>Delete</DeleteButton>
+                                <td className="py-2 px-4 border">
+                                    <div className="flex justify-center">
+                                        <EditButton onClick={() => toggleModal(importation)}
+                                                    className="mr-2">Edit</EditButton>
+                                        <DeleteButton onClick={() => handleDelete(importation._id)}
+                                                      className="">Delete</DeleteButton>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

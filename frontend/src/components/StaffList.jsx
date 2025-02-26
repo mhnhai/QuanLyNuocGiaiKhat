@@ -112,8 +112,12 @@ const StaffList = () => {
                                 <td className="py-2 px-4 border">{staff.position}</td>
                                 <td className="py-2 px-4 border">{staff.salary}</td>
                                 <td className="py-2 px-4 border">
-                                    <EditButton onClick={() => toggleModal(staff)}>Edit</EditButton>
-                                    <DeleteButton onClick={() => handleDelete(staff._id)}>Delete</DeleteButton>
+                                    <div className="flex justify-center">
+                                        <EditButton onClick={() => toggleModal(staff)}
+                                                    className="mr-2">Edit</EditButton>
+                                        <DeleteButton onClick={() => handleDelete(staff._id)}
+                                                      className="">Delete</DeleteButton>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

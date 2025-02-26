@@ -6,7 +6,7 @@ class CustomerModel(BaseModel):
     id: str = Field(alias="_id", default=None)
     fullname: str
     address: str
-    phone: str
+    phone: str = Field(..., min_length=10, max_length=10)
 
     class Config:
         allow_population_by_field_name = True

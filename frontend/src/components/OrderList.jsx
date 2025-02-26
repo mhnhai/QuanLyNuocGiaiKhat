@@ -150,10 +150,13 @@ const OrderList = () => {
                                 <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
                                 <td className="py-2 px-4 border">{order.total_price}</td>
                                 <td className="py-2 px-4 border">{order.status}</td>
-                                <td className="py-2 px-4 border flex justify-center">
-                                    <EditButton onClick={() => toggleModal(order)}>Edit</EditButton>
-                                    <DeleteButton onClick={() => handleDelete(order._id)}
-                                                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Delete</DeleteButton>
+                                <td className="py-2 px-4 border">
+                                    <div className="flex justify-center">
+                                        <EditButton onClick={() => toggleModal(order)}
+                                                    className="mr-2">Edit</EditButton>
+                                        <DeleteButton onClick={() => handleDelete(order._id)}
+                                                      className="">Delete</DeleteButton>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

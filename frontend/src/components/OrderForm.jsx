@@ -7,9 +7,8 @@ import payment_formService from "../services/payment_form.service";
 import formatDateTime from "../utils/formatDateTime";
 import { Button, DeleteButton } from "./Button";
 import { FaDeleteLeft } from "react-icons/fa6";
-import {IoMdAddCircleOutline, IoMdClose} from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdClose } from "react-icons/io";
 import Select from 'react-select';
-
 
 const OrderForm = ({ order, onSave, onClose }) => {
     const [formData, setFormData] = useState(order || {
@@ -26,6 +25,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
     const [statuses, setStatuses] = useState([]);
     const [payment_forms, setPayment_forms] = useState([]);
     const [customers, setCustomers] = useState([]);
+
     useEffect(() => {
         if (order) {
             setFormData(order);
@@ -41,7 +41,12 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     payment_formService.getPaymentForms(),
                     CustomerService.getAll(),
                 ]);
-                setProducts(productsResponse.data);
+                setProducts(productsResponse.data.map(product => ({
+                    value: product._id,
+                    label: product.name,
+                    selling_price: product.selling_price,
+                    stock: product.stock
+                })));
                 setStatuses(statusesResponse);
                 setPayment_forms(paymentsFormResponse);
                 setCustomers(customersResponse.data.map(customer => ({
@@ -76,16 +81,30 @@ const OrderForm = ({ order, onSave, onClose }) => {
         });
     };
 
-    const handleProductChange = (index, e) => {
+    const handleProductChange = (index, selectedOption) => {
+        const updatedProducts = formData.order_items.map((product, i) => {
+            if (i === index) {
+                return {
+                    ...product,
+                    id_product: selectedOption ? selectedOption.value : '',
+                    selling_price: selectedOption ? selectedOption.selling_price : ''
+                };
+            }
+            return product;
+        });
+        const totalPrice = calculateTotalPrice(updatedProducts);
+        setFormData({
+            ...formData,
+            order_items: updatedProducts,
+            total_price: totalPrice
+        });
+    };
+
+    const handleQuantityChange = (index, e) => {
         const { name, value } = e.target;
         const updatedProducts = formData.order_items.map((product, i) => {
             if (i === index) {
-                const updatedProduct = { ...product, [name]: value };
-                if (name === 'id_product') {
-                    const selectedProduct = products.find(p => p._id === value);
-                    updatedProduct.selling_price = selectedProduct ? selectedProduct.selling_price : '';
-                }
-                return updatedProduct;
+                return { ...product, [name]: value };
             }
             return product;
         });
@@ -112,17 +131,14 @@ const OrderForm = ({ order, onSave, onClose }) => {
         });
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if there are no products
         if (formData.order_items.length === 0) {
             alert("Order must contain at least one product.");
             return;
         }
 
-        // Check if any product fields are empty
         for (const item of formData.order_items) {
             if (!item.id_product || !item.quantity || !item.selling_price) {
                 alert("All product fields must be filled.");
@@ -132,7 +148,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
 
         try {
             const updatedOrderItems = formData.order_items.map(item => {
-                const product = products.find(p => p._id === item.id_product);
+                const product = products.find(p => p.value === item.id_product);
                 return {
                     ...item,
                     selling_price: product ? product.selling_price : item.selling_price
@@ -153,13 +169,17 @@ const OrderForm = ({ order, onSave, onClose }) => {
             }
 
             for (const item of updatedOrderItems) {
-                const product = products.find(p => p._id === item.id_product);
+                const product = await ProductService.getById(item.id_product);
                 if (product) {
+                    if(product.data.stock < item.quantity){
+                        alert("Số lượng không đủ, hãy giảm số lượng đặt hoặc đổi sản phẩm khác.")
+                        return;
+                    }
                     const updatedProduct = {
-                        ...product,
-                        stock: product.stock - parseInt(item.quantity, 10)
+                        ...product.data,
+                        stock: product.data.stock - parseInt(item.quantity, 10)
                     };
-                    await ProductService.update(product._id, updatedProduct);
+                    await ProductService.update(product.data._id, updatedProduct);
                 }
             }
             onSave(response.data);
@@ -177,7 +197,6 @@ const OrderForm = ({ order, onSave, onClose }) => {
                 ...formData,
                 status: nextStatus
             });
-            // Update shipping_date if the next status is statuses[0] là đang giao
             if (currentIndex >= 0) {
                 setFormData({
                     ...formData,
@@ -185,7 +204,6 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     status: nextStatus
                 });
             }
-
         }
     };
 
@@ -209,7 +227,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex justify-end">
                 <Button onClick={onClose} type="button">
-                    <IoMdClose size={24}/>
+                    <IoMdClose size={24} />
                 </Button>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -231,13 +249,11 @@ const OrderForm = ({ order, onSave, onClose }) => {
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày tạo
-                        đơn: {formatDateTime(formData.order_date)}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày tạo đơn: {formatDateTime(formData.order_date)}</label>
                     <input type="hidden" name="order_date" value={formData.order_date}/>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển
-                        hàng: {formatDateTime(formData.shipping_date)}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển hàng: {formatDateTime(formData.shipping_date)}</label>
                     <input type="hidden" name="shipping_date" value={formData.shipping_date}/>
                 </div>
                 <div>
@@ -290,19 +306,18 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     {formData.order_items.map((product, index) => (
                         <tr key={index}>
                             <td className="py-2 px-4 border">
-                                <select name="id_product" value={product.id_product}
-                                        onChange={(e) => handleProductChange(index, e)} required
-                                        disabled={!!order}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    <option value="">--Sản phẩm--</option>
-                                    {products.map((p) => (
-                                        <option key={p._id} value={p._id}>{p.name}</option>
-                                    ))}
-                                </select>
+                                <Select
+                                    value={products.find(option => option.value === product.id_product)}
+                                    onChange={(selectedOption) => handleProductChange(index, selectedOption)}
+                                    options={products}
+                                    isDisabled={!!order}
+                                    className="mt-1 block w-full"
+                                    placeholder="--Sản phẩm--"
+                                />
                             </td>
                             <td className="py-2 px-4 border">
                                 <input type="number" name="quantity" value={product.quantity}
-                                       onChange={(e) => handleProductChange(index, e)} required
+                                       onChange={(e) => handleQuantityChange(index, e)} required
                                        disabled={!!order}
                                        className="mt-1 block w-20 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                        placeholder="Quantity"/>
@@ -317,8 +332,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                             </td>
                             {!order && (
                                 <td className="py-2 px-4 border">
-                                    <DeleteButton onClick={() => removeProduct(index)}
-                                    >
+                                    <DeleteButton onClick={() => removeProduct(index)}>
                                         <FaDeleteLeft className="mr-2" size={24}/>
                                     </DeleteButton>
                                 </td>
@@ -330,12 +344,11 @@ const OrderForm = ({ order, onSave, onClose }) => {
             </div>
             <div className="flex justify-end">
                 {order && formData.status === statuses[0] && (
-                    <DeleteButton type="button" onClick={handleCancelOrder} className="mr-1"
-                    >Hủy đơn
+                    <DeleteButton type="button" onClick={handleCancelOrder} className="mr-1">
+                        Hủy đơn
                     </DeleteButton>
                 )}
                 <Button type="submit">Lưu</Button>
-
             </div>
         </form>
     );

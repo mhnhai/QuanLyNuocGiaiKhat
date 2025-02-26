@@ -105,13 +105,12 @@ const CustomerList = () => {
                             <td className="py-2 px-4 border">{customer.fullname}</td>
                             <td className="py-2 px-4 border">{customer.address}</td>
                             <td className="py-2 px-4 border">{customer.phone}</td>
-                            <td className="py-2 px-4 border flex justify-center">
-                                <EditButton onClick={() => toggleModal(customer)}>
-                                    Edit
-                                </EditButton>
-                                <DeleteButton onClick={() => handleDelete(customer._id)}>
-                                    Delete
-                                </DeleteButton>
+                            <td className="py-2 px-4 border">
+                                <div className="flex justify-center">
+                                    <EditButton onClick={() => toggleModal(customer)} className="mr-2">Edit</EditButton>
+                                    <DeleteButton onClick={() => handleDelete(customer._id)}
+                                                  className="">Delete</DeleteButton>
+                                </div>
                             </td>
                         </tr>
                     ))}

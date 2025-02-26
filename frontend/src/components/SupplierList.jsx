@@ -108,9 +108,13 @@ const SupplierList = () => {
                             <tr key={supplier._id}>
                                 <td className="py-2 px-4 border">{supplier.name}</td>
                                 <td className="py-2 px-4 border">{supplier.phone}</td>
-                                <td className="py-2 px-4 border flex justify-center">
-                                    <DeleteButton onClick={() => toggleModal(supplier)}>Edit</DeleteButton>
-                                    <EditButton onClick={() => handleDelete(supplier._id)}>Delete</EditButton>
+                                <td className="py-2 px-4 border">
+                                    <div className="flex justify-center">
+                                        <EditButton onClick={() => toggleModal(supplier)}
+                                                    className="mr-2">Edit</EditButton>
+                                        <DeleteButton onClick={() => handleDelete(supplier._id)}
+                                                      className="">Delete</DeleteButton>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

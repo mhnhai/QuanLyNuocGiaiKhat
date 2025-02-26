@@ -32,7 +32,8 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                 setProducts(response.data.map(product => ({
                     value: product._id,
                     label: product.name,
-                    import_price: product.import_price
+                    import_price: product.import_price,
+                    stock: product.stock
                 })));
             } catch (error) {
                 console.error('Error fetching products:', error);
@@ -68,16 +69,14 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
         });
     };
 
-    const handleProductChange = (index, e) => {
-        const { name, value } = e.target;
+    const handleProductChange = (index, selectedOption) => {
         const updatedProducts = formData.import_items.map((product, i) => {
             if (i === index) {
-                const updatedProduct = { ...product, [name]: value };
-                if (name === 'id_product') {
-                    const selectedProduct = products.find(p => p._id === value);
-                    updatedProduct.import_price = selectedProduct ? selectedProduct.import_price : '';
-                }
-                return updatedProduct;
+                return {
+                    ...product,
+                    id_product: selectedOption ? selectedOption.value : '',
+                    import_price: selectedOption ? selectedOption.import_price : ''
+                };
             }
             return product;
         });
@@ -143,13 +142,13 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
             }
 
             for (const item of updatedImportItems) {
-                const product = products.find(p => p.value === item.id_product);
+                const product = await ProductService.getById(item.id_product);
                 if (product) {
                     const updatedProduct = {
-                        ...product,
-                        stock: product.stock + parseInt(item.quantity, 10)
+                        ...product.data,
+                        stock: product.data.stock + parseInt(item.quantity, 10)
                     };
-                    await ProductService.update(product.value, updatedProduct);
+                    await ProductService.update(product.data._id, updatedProduct);
                 }
             }
             onSave(response.data);
@@ -197,36 +196,62 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                 </div>
             </div>
             <div>
-                <label className="block text-sm font-medium text-gray-700">Products:</label>
-                {formData.import_items.map((product, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-3 mb-2">
-                        <select name="id_product" value={product.id_product}
-                                onChange={(e) => handleProductChange(index, e)} required
-                                disabled={!!importation}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">--Sản phẩm--</option>
-                            {products.map((p) => (
-                                <option key={p._id} value={p._id}>{p.name}</option>
-                            ))}
-                        </select>
-                        <input type="number" name="quantity" value={product.quantity}
-                               onChange={(e) => handleProductChange(index, e)} required
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
-                        <input type="text" name="import_price" value={product.import_price} disabled
-                               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
-                        <button type="button" onClick={() => removeProduct(index)}
-                                className="mt-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Remove
-                        </button>
-                    </div>
-                ))}
+
+                <table className="min-w-full bg-white">
+                    <thead>
+                    <tr>
+                        <th className="py-2 px-4 border">Sản phẩm</th>
+                        <th className="py-2 px-4 border">Số lượng</th>
+                        <th className="py-2 px-4 border">Giá bán</th>
+                        <th className="py-2 px-4 border">Tổng cộng</th>
+                        {!importation && <th className="py-2 px-4 border">Hành động</th>}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {formData.import_items.map((product, index) => (
+                        <tr key={index}>
+                            <td className="py-2 px-4 border">
+                                <Select
+                                    value={products.find(option => option.value === product.id_product)}
+                                    onChange={(selectedOption) => handleProductChange(index, selectedOption)}
+                                    options={products}
+                                    isDisabled={!!importation}
+                                    className="mt-1 block w-full"
+                                    placeholder="--Sản phẩm--"
+                                />
+                            </td>
+                            <td className="py-2 px-4 border">
+                                <input type="number" name="quantity" value={product.quantity}
+                                       onChange={(e) => handleQuantityChange(index, e)} required
+                                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+
+                            </td>
+                            <td className="py-2 px-4 border">
+                                <input type="text" name="import_price" value={product.import_price} disabled
+                                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+
+                            </td>
+                            <td className="py-2 px-4 border">
+                                {product.quantity * product.import_price}
+                            </td>
+                            {!importation && (
+                                <td className="py-2 px-4 border">
+                                <DeleteButton onClick={() => removeProduct(index)}>
+                                        <FaDeleteLeft className="mr-2" size={24}/>
+                                    </DeleteButton>
+                                </td>
+                            )}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
                 <button type="button" onClick={addProduct}
                         className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product
                 </button>
             </div>
-            <button type="submit"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save
-                Importation
-            </button>
+            <Button type="submit">
+                Lưu
+            </Button>
         </form>
     );
 };
