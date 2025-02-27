@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import SupplierService from "../services/supplier.service";
+import { Button } from "./Button";
+import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
     name: yup.string().required('Hãy nhập tên'),
@@ -10,7 +12,7 @@ const validationSchema = yup.object({
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
 });
 
-const SupplierForm = ({ supplier, onSave }) => {
+const SupplierForm = ({ supplier, onSave, onClose }) => {
     const formik = useFormik( {
         initialValues: {
             name: '',
@@ -42,6 +44,11 @@ const SupplierForm = ({ supplier, onSave }) => {
 
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
+            <div className="flex justify-end">
+                <Button onClick={onClose} type="button">
+                    <IoMdClose size={24}/>
+                </Button>
+            </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Name:</label>
@@ -100,12 +107,9 @@ const SupplierForm = ({ supplier, onSave }) => {
                     ) : null}
                 </div>
             </div>
-            <button
-                type="submit"
-                className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                Save Supplier
-            </button>
+            <div className="flex justify-end space-x-2">
+                <Button type="submit">Lưu</Button>
+            </div>
         </form>
     );
 };

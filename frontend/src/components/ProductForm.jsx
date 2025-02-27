@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import ProductService from "../services/product.service";
 import SupplierService from "../services/supplier.service";
 import { Button } from "./Button";
+import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
     id_supplier: yup.string().required('Nhập nhà cung cấp'),
@@ -17,7 +18,7 @@ const validationSchema = yup.object({
     description: yup.string().required('Nhập mô tả'),
 });
 
-const ProductForm = ({ product, onSave }) => {
+const ProductForm = ({ product, onSave, onClose }) => {
     const formik = useFormik({
         initialValues: {
             id_supplier: '',
@@ -80,6 +81,11 @@ const ProductForm = ({ product, onSave }) => {
 
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
+            <div className="flex justify-end">
+                <Button onClick={onClose} type="button">
+                    <IoMdClose size={24}/>
+                </Button>
+            </div>
             <div className="grid grid-cols-4 gap-3">
                 <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Tên sản phẩm:</label>

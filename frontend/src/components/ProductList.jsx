@@ -107,8 +107,7 @@ const ProductList = () => {
                 onRequestClose={toggleModal}
                 style={modalStyles}
             >
-                <ProductForm product={selectedProduct} onSave={handleProductSave} />
-                <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Đóng</button>
+                <ProductForm product={selectedProduct} onSave={handleProductSave} onClose={toggleModal} />
             </Modal>
             {loading ? (
                 <p>Loading...</p>

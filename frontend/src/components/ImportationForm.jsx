@@ -6,7 +6,7 @@ import SupplierService from "../services/supplier.service";
 import Select from 'react-select';
 import { FaDeleteLeft } from "react-icons/fa6";
 import { Button, DeleteButton, EditButton } from "./Button";
-import { IoMdClose } from "react-icons/io";
+import {IoMdAddCircleOutline, IoMdClose} from "react-icons/io";
 
 const ImportationForm = ({ importation, onSave, onClose }) => {
     const [formData, setFormData] = useState(importation || {
@@ -122,6 +122,11 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            if (formData.import_items.length === 0) {
+                alert("Phải có ít nhất 1 sản phẩm trong đơn.");
+                return;
+            }
+
             const updatedImportItems = formData.import_items.map(item => {
                 const product = products.find(p => p.value === item.id_product);
                 return {
@@ -166,7 +171,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
             </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Supplier:</label>
+                    <label className="block text-sm font-medium text-gray-700">Nhà cung cấp:</label>
                     <Select
                         value={suppliers.find(option => option.value === formData.id_supplier)}
                         onChange={(selectedOption) => setFormData({
@@ -174,29 +179,39 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                             id_supplier: selectedOption ? selectedOption.value : ''
                         })}
                         options={suppliers}
+                        isDisabled={!!importation}
                         className="mt-1 block w-full"
                         placeholder="-- Chọn nhà cung cấp --"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Staff ID:</label>
+                    <label className="block text-sm font-medium text-gray-700">Nhân viên:</label>
                     <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
+                           disabled={!!importation}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Import Date:</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày nhập:</label>
                     <input type="date" name="import_date" value={formData.import_date.split('T')[0]} onChange={handleChange} required
+                           disabled={!!importation}
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Total Price:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tổng cộng:</label>
                     <input type="number" step="0.01" name="total_price" value={formData.total_price} disabled
                            onChange={handleChange} required
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                 </div>
+                <div className="flex justify-between">
+                    {!importation && (
+                        <Button onClick={addProduct} className="bg-blue-500 hover:bg-blue-600">
+                            <IoMdAddCircleOutline size={24}/>
+                        </Button>
+                    )}
+                </div>
+
             </div>
             <div>
-
                 <table className="min-w-full bg-white">
                     <thead>
                     <tr>
@@ -223,6 +238,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                             <td className="py-2 px-4 border">
                                 <input type="number" name="quantity" value={product.quantity}
                                        onChange={(e) => handleQuantityChange(index, e)} required
+                                       disabled={!!importation}
                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
 
                             </td>
@@ -245,13 +261,15 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                     ))}
                     </tbody>
                 </table>
-                <button type="button" onClick={addProduct}
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product
-                </button>
             </div>
-            <Button type="submit">
-                Lưu
-            </Button>
+            <div className="flex justify-end">
+                {!importation && (
+                    <Button type="submit">
+                        Lưu
+                    </Button>
+                )}
+            </div>
+
         </form>
     );
 };

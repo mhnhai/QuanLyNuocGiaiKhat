@@ -135,7 +135,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
         e.preventDefault();
 
         if (formData.order_items.length === 0) {
-            alert("Order must contain at least one product.");
+            alert("Phải có ít nhất 1 sản phẩm trong đơn.");
             return;
         }
 
