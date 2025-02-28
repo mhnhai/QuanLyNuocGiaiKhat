@@ -90,32 +90,60 @@ const CustomerList = () => {
                 </div>
             </Modal>
             <div className="overflow-auto" style={{maxHeight: '72vh'}}>
-                <table className="min-w-full bg-white">
-                    <thead className="sticky top-0 bg-white">
-                    <tr>
-                        <th className="py-2 px-4 border">Họ tên</th>
-                        <th className="py-2 px-4 border">Địa chỉ</th>
-                        <th className="py-2 px-4 border">Số điện thoại</th>
-                        <th className="py-2 px-4 border">Hành động</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {customers.map((customer) => (
-                        <tr key={customer._id}>
-                            <td className="py-2 px-4 border">{customer.fullname}</td>
-                            <td className="py-2 px-4 border">{customer.address}</td>
-                            <td className="py-2 px-4 border">{customer.phone}</td>
-                            <td className="py-2 px-4 border">
-                                <div className="flex justify-center">
-                                    <EditButton onClick={() => toggleModal(customer)} className="mr-2">Edit</EditButton>
-                                    <DeleteButton onClick={() => handleDelete(customer._id)}
-                                                  className="">Delete</DeleteButton>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <div className="overflow-x-auto ">
+                    <table className="table bg-white">
+                        <thead>
+                            <tr>
+                                <th className="py-2 px-4 border">Họ tên</th>
+                                <th className="py-2 px-4 border">Địa chỉ</th>
+                                <th className="py-2 px-4 border">Số điện thoại</th>
+                                <th className="py-2 px-4 border">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {customers.map((customer) => (
+                                <tr key={customer._id}>
+                                    <td className="py-2 px-4 border">{customer.fullname}</td>
+                                    <td className="py-2 px-4 border">{customer.address}</td>
+                                    <td className="py-2 px-4 border">{customer.phone}</td>
+                                    <td className="py-2 px-4 border">
+                                        <div className="flex justify-center">
+                                            <button onClick={() => toggleModal(customer)} className="btn btn-outline btn-info">Xem chi tiết</button>
+                                            <DeleteButton onClick={() => handleDelete(customer._id)}
+                                                          className="">Delete</DeleteButton>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {/*<table className="min-w-full bg-white">*/}
+                {/*    <thead className="sticky top-0 bg-white">*/}
+                {/*    <tr>*/}
+                {/*        <th className="py-2 px-4 border">Họ tên</th>*/}
+                {/*        <th className="py-2 px-4 border">Địa chỉ</th>*/}
+                {/*        <th className="py-2 px-4 border">Số điện thoại</th>*/}
+                {/*        <th className="py-2 px-4 border">Hành động</th>*/}
+                {/*    </tr>*/}
+                {/*    </thead>*/}
+                {/*    <tbody>*/}
+                {/*    {customers.map((customer) => (*/}
+                {/*        <tr key={customer._id}>*/}
+                {/*            <td className="py-2 px-4 border">{customer.fullname}</td>*/}
+                {/*            <td className="py-2 px-4 border">{customer.address}</td>*/}
+                {/*            <td className="py-2 px-4 border">{customer.phone}</td>*/}
+                {/*            <td className="py-2 px-4 border">*/}
+                {/*                <div className="flex justify-center">*/}
+                {/*                    <EditButton onClick={() => toggleModal(customer)} className="mr-2">Edit</EditButton>*/}
+                {/*                    <DeleteButton onClick={() => handleDelete(customer._id)}*/}
+                {/*                                  className="">Delete</DeleteButton>*/}
+                {/*                </div>*/}
+                {/*            </td>*/}
+                {/*        </tr>*/}
+                {/*    ))}*/}
+                {/*    </tbody>*/}
+                {/*</table>*/}
             </div>
         </div>
     );

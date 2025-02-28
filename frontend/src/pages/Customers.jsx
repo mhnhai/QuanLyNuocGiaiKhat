@@ -1,5 +1,4 @@
 import React from "react";
-import AccountList from "../components/AccountList"
 import CustomerList from "../components/CustomerList";
 const Customers = () => {
     return (
