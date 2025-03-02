@@ -92,8 +92,8 @@ const SupplierList = () => {
                 <p>Loading...</p>
             ) : (
                 <div className="overflow-auto" style={{maxHeight: '72vh'}}>
-                    <table className="min-w-full bg-white">
-                        <thead className="sticky top-0 bg-white">
+                    <table className="table bg-white">
+                        <thead>
                         <tr>
                             <th className="py-2 px-4 border">Name</th>
                             <th className="py-2 px-4 border">Phone</th>
@@ -107,10 +107,9 @@ const SupplierList = () => {
                                 <td className="py-2 px-4 border">{supplier.phone}</td>
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
-                                        <EditButton onClick={() => toggleModal(supplier)}
-                                                    className="mr-2">Edit</EditButton>
-                                        <DeleteButton onClick={() => handleDelete(supplier._id)}
-                                                      className="">Delete</DeleteButton>
+                                        <button onClick={() => toggleModal(supplier)}
+                                                className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

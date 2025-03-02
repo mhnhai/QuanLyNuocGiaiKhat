@@ -90,7 +90,7 @@ const CustomerList = () => {
                 </div>
             </Modal>
             <div className="overflow-auto" style={{maxHeight: '72vh'}}>
-                <div className="overflow-x-auto ">
+                <div className="overflow-x-auto">
                     <table className="table bg-white">
                         <thead>
                             <tr>
@@ -108,9 +108,7 @@ const CustomerList = () => {
                                     <td className="py-2 px-4 border">{customer.phone}</td>
                                     <td className="py-2 px-4 border">
                                         <div className="flex justify-center">
-                                            <button onClick={() => toggleModal(customer)} className="btn btn-outline btn-info">Xem chi tiết</button>
-                                            <DeleteButton onClick={() => handleDelete(customer._id)}
-                                                          className="">Delete</DeleteButton>
+                                            <button onClick={() => toggleModal(customer)} className="btn btn-sm btn-outline btn-info">Xem chi tiết</button>
                                         </div>
                                     </td>
                                 </tr>

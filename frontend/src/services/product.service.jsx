@@ -3,6 +3,16 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8000/api/products';
 
 class ProductService {
+    async getProductCount(){
+        try {
+            const response = await axios.get(`${API_URL}/count`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching product count:', error);
+            throw error;
+        }
+    }
+
     async getAll() {
         try {
             const response = await axios.get(API_URL);
@@ -62,6 +72,8 @@ class ProductService {
             throw error;
         }
     }
+
+
 }
 
 export default new ProductService();

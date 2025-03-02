@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import StaffService from "../services/staff.service";
 import PositionService from "../services/position.service";
 import RoleService from "../services/role.service";
+import {Button} from "./Button";
+import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
     name: yup.string().required('Hãy nhập tên'),
@@ -18,7 +20,7 @@ const validationSchema = yup.object({
     address: yup.string().required('Hãy nhập địa chỉ'),
 });
 
-const StaffForm = ({ staff, onSave }) => {
+const StaffForm = ({ staff, onSave, onClose }) => {
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -73,8 +75,8 @@ const StaffForm = ({ staff, onSave }) => {
             try {
                 const response = await RoleService.getRoles();
                 setRoles(response.map(role => ({
-                    value: role,
-                    label: role
+                    value: role.key,
+                    label: role.name
                 })));
             } catch (error) {
                 console.error('Error fetching roles:', error);
@@ -95,6 +97,11 @@ const StaffForm = ({ staff, onSave }) => {
 
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
+            <div className="flex justify-end">
+                <Button onClick={onClose} type="button">
+                    <IoMdClose size={24}/>
+                </Button>
+            </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Name:</label>
@@ -170,7 +177,7 @@ const StaffForm = ({ staff, onSave }) => {
                     <input
                         type="date"
                         name="birth_date"
-                        value={formik.values.birth_date}
+                        value={formik.values.birth_date.split('T')[0]}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -221,12 +228,9 @@ const StaffForm = ({ staff, onSave }) => {
                     ) : null}
                 </div>
             </div>
-            <button
-                type="submit"
-                className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                Save Staff
-            </button>
+            <div className="flex justify-end space-x-2">
+                <Button type="submit">Lưu</Button>
+            </div>
         </form>
     );
 };

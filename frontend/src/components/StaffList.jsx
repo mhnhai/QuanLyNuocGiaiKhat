@@ -3,7 +3,6 @@ import StaffService from "../services/staff.service";
 import StaffForm from "./StaffForm";
 import Modal from "react-modal";
 import {Button, DeleteButton, EditButton} from "./Button";
-import searchBar from "./SearchBar";
 import SearchBar from "./SearchBar";
 
 const StaffList = () => {
@@ -88,21 +87,20 @@ const StaffList = () => {
                 style={modalStyles}
             >
                 <div>
-                    <StaffForm staff={selectedStaff} onSave={handleStaffSave}/>
-                    <button onClick={toggleModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">Close</button>
+                    <StaffForm staff={selectedStaff} onSave={handleStaffSave} onClose={toggleModal}/>
                 </div>
             </Modal>
             {loading ? (
                 <p>Loading...</p>
             ) : (
                 <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
-                    <table className="min-w-full bg-white">
-                        <thead className="sticky top-0 bg-white">
+                    <table className="table bg-white">
+                        <thead>
                         <tr>
-                            <th className="py-2 px-4 border">Name</th>
-                            <th className="py-2 px-4 border">position</th>
-                            <th className="py-2 px-4 border">salary</th>
-                            <th className="py-2 px-4 border">Action</th>
+                            <th className="py-2 px-4 border">Tên</th>
+                            <th className="py-2 px-4 border">Vị trí công việc</th>
+                            <th className="py-2 px-4 border">Lương</th>
+                            <th className="py-2 px-4 border">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -113,10 +111,10 @@ const StaffList = () => {
                                 <td className="py-2 px-4 border">{staff.salary}</td>
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
-                                        <EditButton onClick={() => toggleModal(staff)}
-                                                    className="mr-2">Edit</EditButton>
-                                        <DeleteButton onClick={() => handleDelete(staff._id)}
-                                                      className="">Delete</DeleteButton>
+                                        <button onClick={() => toggleModal(staff)}
+                                                className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                        </button>
+
                                     </div>
                                 </td>
                             </tr>

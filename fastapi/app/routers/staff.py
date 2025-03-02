@@ -11,7 +11,7 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/staffs", response_model=List[StaffModel])
+@router.get("/staffs", response_model=List[StaffModel], tags=["Staffs"])
 async def read_staffs():
     try:
         staffs = []
@@ -23,7 +23,7 @@ async def read_staffs():
         logger.error(f"Error retrieving staffs: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/staffs/{staff_id}", response_model=StaffModel)
+@router.get("/staffs/{staff_id}", response_model=StaffModel, tags=["Staffs"])
 async def read_staff(staff_id: str):
     try:
         if not ObjectId.is_valid(staff_id):
@@ -37,15 +37,10 @@ async def read_staff(staff_id: str):
         logger.error(f"Error retrieving staff with id {staff_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/staffs", response_model=StaffModel)
+@router.post("/staffs", response_model=StaffModel, tags=["Staffs"])
 async def create_staff(staff: StaffModel):
     try:
         staff_dict = staff.dict(by_alias=True, exclude_unset=True)
-        
-        # Convert datetime.date to datetime.datetime
-        if isinstance(staff_dict.get('birth_date'), date):
-            staff_dict['birth_date'] = datetime.combine(staff_dict['birth_date'], datetime.min.time())
-        
         if "_id" in staff_dict:
             del staff_dict["_id"]  # Ensure _id is not included in the document to let MongoDB generate it
         
@@ -56,7 +51,7 @@ async def create_staff(staff: StaffModel):
         logger.error(f"Error creating staff: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.put("/staffs/{staff_id}", response_model=StaffModel)
+@router.put("/staffs/{staff_id}", response_model=StaffModel, tags=["Staffs"])
 async def update_staff(staff_id: str, staff: StaffModel):
     try:
         if not ObjectId.is_valid(staff_id):
@@ -86,7 +81,7 @@ async def update_staff(staff_id: str, staff: StaffModel):
         logger.error(f"Error updating staff with id {staff_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/staffs/{staff_id}", response_model=dict)
+@router.delete("/staffs/{staff_id}", response_model=dict, tags=["Staffs"])
 async def delete_staff(staff_id: str):
     try:
         if not ObjectId.is_valid(staff_id):
@@ -99,7 +94,7 @@ async def delete_staff(staff_id: str):
         logger.error(f"Error deleting staff with id {staff_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/staffs", response_model=dict)
+@router.delete("/staffs", response_model=dict, tags=["Staffs"])
 async def delete_all_staffs():
     try:
         result = await staffs_collection.delete_many({})

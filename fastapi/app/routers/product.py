@@ -10,7 +10,17 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/products", response_model=List[ProductModel])
+@router.get("/products/count", response_model=dict, tags=["Products"])
+async def count_products():
+    try:
+        count = await products_collection.count_documents({})
+        logger.info(f"Product count: {count}")
+        return {"total_products": count}
+    except Exception as e:
+        logger.error(f"Error counting products: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@router.get("/products", response_model=List[ProductModel], tags=["Products"])
 async def read_products():
     try:
         products = []
@@ -22,7 +32,7 @@ async def read_products():
         logger.error(f"Error retrieving products: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/products/{product_id}", response_model=ProductModel)
+@router.get("/products/{product_id}", response_model=ProductModel, tags=["Products"])
 async def read_product(product_id: str):
     try:
         if not ObjectId.is_valid(product_id):
@@ -36,7 +46,7 @@ async def read_product(product_id: str):
         logger.error(f"Error retrieving product with id {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/products", response_model=ProductModel)
+@router.post("/products", response_model=ProductModel, tags=["Products"])
 async def create_product(product: ProductModel):
     try:
         product_dict = product.dict(by_alias=True, exclude_unset=True)
@@ -49,7 +59,7 @@ async def create_product(product: ProductModel):
         logger.error(f"Error creating product: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.put("/products/{product_id}", response_model=ProductModel)
+@router.put("/products/{product_id}", response_model=ProductModel, tags=["Products"])
 async def update_product(product_id: str, product: ProductModel):
     try:
         if not ObjectId.is_valid(product_id):
@@ -74,7 +84,7 @@ async def update_product(product_id: str, product: ProductModel):
         logger.error(f"Error updating product with id {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/products/{product_id}", response_model=dict)
+@router.delete("/products/{product_id}", response_model=dict, tags=["Products"])
 async def delete_product(product_id: str):
     try:
         if not ObjectId.is_valid(product_id):
@@ -87,7 +97,7 @@ async def delete_product(product_id: str):
         logger.error(f"Error deleting product with id {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/products", response_model=dict)
+@router.delete("/products", response_model=dict, tags=["Products"])
 async def delete_all_products():
     try:
         result = await products_collection.delete_many({})
@@ -95,3 +105,4 @@ async def delete_all_products():
     except Exception as e:
         logger.error(f"Error deleting all products: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    

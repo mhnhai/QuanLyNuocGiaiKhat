@@ -1,24 +1,31 @@
 // frontend/src/components/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import isStaff from "../components/Authentication";
 
 const Login = ({ onLogin }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Giả sử người dùng có username là 'admin' và password là 'password'
-        if (username === 'admin' && password === 'password') {
+        const staff = await isStaff(username, password);
+        if(!staff){
+                alert('Sai tên đăng nhập hoặc mật khẩu');
+        }  else if (staff.role_account==='admin') {
             const user = { username, role: 'admin' };
             localStorage.setItem('user', JSON.stringify(user));
             onLogin();
             navigate('/');
         } else {
-            alert('Sai tên đăng nhập hoặc mật khẩu');
-        }
-    };
+            const user = { username, role: 'staff' };
+            localStorage.setItem('user', JSON.stringify(user));
+            onLogin();
+            navigate('/');
+        };
+    }
+
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100">

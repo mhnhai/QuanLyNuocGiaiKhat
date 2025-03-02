@@ -11,7 +11,7 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/suppliers", response_model=List[SupplierModel])
+@router.get("/suppliers", response_model=List[SupplierModel], tags=["Suppliers"])
 async def read_suppliers():
     try:
         suppliers = []
@@ -23,7 +23,7 @@ async def read_suppliers():
         logger.error(f"Error retrieving suppliers: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/suppliers/{supplier_id}", response_model=SupplierModel)
+@router.get("/suppliers/{supplier_id}", response_model=SupplierModel, tags=["Suppliers"])
 async def read_supplier(supplier_id: str):
     try:
         if not ObjectId.is_valid(supplier_id):
@@ -37,7 +37,7 @@ async def read_supplier(supplier_id: str):
         logger.error(f"Error retrieving supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/suppliers", response_model=SupplierModel)
+@router.post("/suppliers", response_model=SupplierModel, tags=["Suppliers"])
 async def create_supplier(supplier: SupplierModel):
     try:
         supplier_dict = supplier.dict(by_alias=True, exclude_unset=True)
@@ -53,7 +53,7 @@ async def create_supplier(supplier: SupplierModel):
         logger.error(f"Error creating supplier: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.put("/suppliers/{supplier_id}", response_model=SupplierModel)
+@router.put("/suppliers/{supplier_id}", response_model=SupplierModel, tags=["Suppliers"])
 async def update_supplier(supplier_id: str, supplier: SupplierModel):
     try:
         if not ObjectId.is_valid(supplier_id):
@@ -78,7 +78,7 @@ async def update_supplier(supplier_id: str, supplier: SupplierModel):
         logger.error(f"Error updating supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/suppliers/{supplier_id}", response_model=dict)
+@router.delete("/suppliers/{supplier_id}", response_model=dict, tags=["Suppliers"])
 async def delete_supplier(supplier_id: str):
     try:
         if not ObjectId.is_valid(supplier_id):
@@ -91,7 +91,7 @@ async def delete_supplier(supplier_id: str):
         logger.error(f"Error deleting supplier with id {supplier_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/suppliers", response_model=dict)
+@router.delete("/suppliers", response_model=dict, tags=["Suppliers"])
 async def delete_all_suppliers():
     try:
         result = await suppliers_collection.delete_many({})

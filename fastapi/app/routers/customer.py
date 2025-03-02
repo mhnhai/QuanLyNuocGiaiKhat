@@ -10,7 +10,17 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/customers", response_model=List[CustomerModel])
+@router.get("/customers/count", response_model=dict,  tags=["Customers"])
+async def count_customers():
+    try:
+        count = await customers_collection.count_documents({})
+        return {"total_customers": count}
+    except Exception as e:
+        logger.error(f"Error counting customers: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/customers", response_model=List[CustomerModel], tags=["Customers"])
 async def read_customers():
     try:
         customers = []
@@ -22,7 +32,7 @@ async def read_customers():
         logger.error(f"Error retrieving customers: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/customers/{customer_id}", response_model=CustomerModel)
+@router.get("/customers/{customer_id}", response_model=CustomerModel, tags=["Customers"])
 async def read_customer(customer_id: str):
     try:
         if not ObjectId.is_valid(customer_id):
@@ -36,7 +46,7 @@ async def read_customer(customer_id: str):
         logger.error(f"Error retrieving customer with id {customer_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/customers", response_model=CustomerModel)
+@router.post("/customers", response_model=CustomerModel, tags=["Customers"])
 async def create_customer(customer: CustomerModel):
     try:
         customer_dict = customer.dict(by_alias=True, exclude_unset=True)
@@ -49,7 +59,7 @@ async def create_customer(customer: CustomerModel):
         logger.error(f"Error creating customer: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.put("/customers/{customer_id}", response_model=CustomerModel)
+@router.put("/customers/{customer_id}", response_model=CustomerModel, tags=["Customers"])
 async def update_customer(customer_id: str, customer: CustomerModel):
     try:
         if not ObjectId.is_valid(customer_id):
@@ -74,7 +84,7 @@ async def update_customer(customer_id: str, customer: CustomerModel):
         logger.error(f"Error updating customer with id {customer_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/customers/{customer_id}", response_model=dict)
+@router.delete("/customers/{customer_id}", response_model=dict, tags=["Customers"])
 async def delete_customer(customer_id: str):
     try:
         if not ObjectId.is_valid(customer_id):
@@ -87,7 +97,7 @@ async def delete_customer(customer_id: str):
         logger.error(f"Error deleting customer with id {customer_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/customers", response_model=dict)
+@router.delete("/customers", response_model=dict, tags=["Customers"])
 async def delete_all_customers():
     try:
         result = await customers_collection.delete_many({})
@@ -95,3 +105,4 @@ async def delete_all_customers():
     except Exception as e:
         logger.error(f"Error deleting all customers: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    

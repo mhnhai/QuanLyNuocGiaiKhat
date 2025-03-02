@@ -11,7 +11,17 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/orders", response_model=List[OrderModel])
+@router.get("/orders/count", response_model=dict,  tags=["Orders"])
+async def count_orders():
+    try:
+        count = await orders_collection.count_documents({})
+        return {"total_orders": count}
+    except Exception as e:
+        logger.error(f"Error counting orders: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/orders", response_model=List[OrderModel], tags=["Orders"])
 async def read_orders():
     try:
         orders = []
@@ -23,7 +33,7 @@ async def read_orders():
         logger.error(f"Error retrieving orders: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/orders/{order_id}", response_model=OrderModel)
+@router.get("/orders/{order_id}", response_model=OrderModel, tags=["Orders"])
 async def read_order(order_id: str):
     try:
         if not ObjectId.is_valid(order_id):
@@ -37,7 +47,7 @@ async def read_order(order_id: str):
         logger.error(f"Error retrieving order with id {order_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/orders", response_model=OrderModel)
+@router.post("/orders", response_model=OrderModel, tags=["Orders"])
 async def create_order(order: OrderModel):
     try:
         order_dict = order.dict(by_alias=True, exclude_unset=True)
@@ -52,7 +62,7 @@ async def create_order(order: OrderModel):
         logger.error(f"Error creating order: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.put("/orders/{order_id}", response_model=OrderModel)
+@router.put("/orders/{order_id}", response_model=OrderModel, tags=["Orders"])
 async def update_order(order_id: str, order: OrderModel):
     try:
         if not ObjectId.is_valid(order_id):
@@ -78,7 +88,7 @@ async def update_order(order_id: str, order: OrderModel):
         logger.error(f"Error updating order with id {order_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/orders/{order_id}", response_model=dict)
+@router.delete("/orders/{order_id}", response_model=dict, tags=["Orders"])
 async def delete_order(order_id: str):
     try:
         if not ObjectId.is_valid(order_id):
@@ -91,7 +101,7 @@ async def delete_order(order_id: str):
         logger.error(f"Error deleting order with id {order_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/orders", response_model=dict)
+@router.delete("/orders", response_model=dict, tags=["Orders"])
 async def delete_all_orders():
     try:
         result = await orders_collection.delete_many({})

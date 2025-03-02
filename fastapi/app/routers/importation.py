@@ -10,7 +10,7 @@ router = APIRouter()
 # Configure logging
 logger = logging.getLogger(__name__)
 
-@router.get("/importations", response_model=List[ImportationModel])
+@router.get("/importations", response_model=List[ImportationModel], tags=["Importations"])
 async def read_importations():
     try:
         importations = []
@@ -22,7 +22,7 @@ async def read_importations():
         logger.error(f"Error retrieving importations: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.get("/importations/{importation_id}", response_model=ImportationModel)
+@router.get("/importations/{importation_id}", response_model=ImportationModel, tags=["Importations"])
 async def read_importation(importation_id: str):
     try:
         if not ObjectId.is_valid(importation_id):
@@ -36,7 +36,7 @@ async def read_importation(importation_id: str):
         logger.error(f"Error retrieving importation with id {importation_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.post("/importations", response_model=ImportationModel)
+@router.post("/importations", response_model=ImportationModel, tags=["Importations"])
 async def create_importation(importation: ImportationModel):
     try:
         importation_dict = importation.dict(by_alias=True, exclude_unset=True)
@@ -51,7 +51,7 @@ async def create_importation(importation: ImportationModel):
         logger.error(f"Error creating importation: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.put("/importations/{importation_id}", response_model=ImportationModel)
+@router.put("/importations/{importation_id}", response_model=ImportationModel, tags=["Importations"])
 async def update_importation(importation_id: str, importation: ImportationModel):
     try:
         if not ObjectId.is_valid(importation_id):
@@ -77,7 +77,7 @@ async def update_importation(importation_id: str, importation: ImportationModel)
         logger.error(f"Error updating importation with id {importation_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
-@router.delete("/importations/{importation_id}", response_model=dict)
+@router.delete("/importations/{importation_id}", response_model=dict, tags=["Importations"])
 async def delete_importation(importation_id: str):
     try:
         if not ObjectId.is_valid(importation_id):
@@ -90,7 +90,7 @@ async def delete_importation(importation_id: str):
         logger.error(f"Error deleting importation with id {importation_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@router.delete("/importations", response_model=dict)
+@router.delete("/importations", response_model=dict, tags=["Importations"])
 async def delete_all_importations():
     try:
         result = await importations_collection.delete_many({})

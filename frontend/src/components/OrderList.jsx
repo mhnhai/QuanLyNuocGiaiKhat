@@ -114,7 +114,7 @@ const OrderList = () => {
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
                 <div className="flex items-center space-x-2">
                     <span>Lọc theo ngày:</span>
-                    <DateFilter onFilter={handleDateFilter} />
+                    <DateFilter onFilter={handleDateFilter}/>
                 </div>
                 <Button onClick={() => toggleModal()} className="flex-initial">Tạo đơn hàng</Button>
             </div>
@@ -131,41 +131,73 @@ const OrderList = () => {
                 <p>Loading...</p>
             ) : (
                 <div className="overflow-auto" style={{maxHeight: '72vh'}}>
-                    <table className="min-w-full bg-white">
-                        <thead className="sticky top-0 bg-gray-400">
-                        <tr>
-                            <th className="py-2 px-4 border">Tên khách hàng</th>
-                            <th className="py-2 px-4 border">Ngày đặt hàng</th>
-                            <th className="py-2 px-4 border">Ngày giao hàng</th>
-                            <th className="py-2 px-4 border">Tổng giá trị</th>
-                            <th className="py-2 px-4 border">Trạng thái</th>
-                            <th className="py-2 px-4 border">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {orders.map((order) => (
-                            <tr key={order._id}>
-                                <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>
-                                <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>
-                                <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
-                                <td className="py-2 px-4 border">{order.total_price}</td>
-                                <td className="py-2 px-4 border">{order.status}</td>
-                                <td className="py-2 px-4 border">
-                                    <div className="flex justify-center">
-                                        <EditButton onClick={() => toggleModal(order)}
-                                                    className="mr-2">Edit</EditButton>
-                                        <DeleteButton onClick={() => handleDelete(order._id)}
-                                                      className="">Delete</DeleteButton>
-                                    </div>
-                                </td>
+                    <div className="overflow-x-auto">
+                        <table className="table bg-white">
+                            <thead>
+                            <tr>
+                                <th className="py-2 px-4 border">Tên khách hàng</th>
+                                <th className="py-2 px-4 border">Ngày đặt hàng</th>
+                                <th className="py-2 px-4 border">Ngày giao hàng</th>
+                                <th className="py-2 px-4 border">Tổng giá trị</th>
+                                <th className="py-2 px-4 border">Trạng thái</th>
+                                <th className="py-2 px-4 border">Action</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {orders.map((order) => (
+                                <tr key={order._id}>
+                                    <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>
+                                    <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>
+                                    <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
+                                    <td className="py-2 px-4 border">{order.total_price}</td>
+                                    <td className="py-2 px-4 border">{order.status}</td>
+                                    <td className="py-2 px-4 border">
+                                        <div className="flex justify-center">
+                                            <button onClick={() => toggleModal(order)}
+                                                    className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {/*    <div className="overflow-auto" style={{maxHeight: '72vh'}}>*/}
+                    {/*        <table className="min-w-full bg-white">*/}
+                    {/*            <thead className="sticky top-0 bg-gray-400">*/}
+                    {/*            <tr>*/}
+                    {/*                <th className="py-2 px-4 border">Tên khách hàng</th>*/}
+                    {/*                <th className="py-2 px-4 border">Ngày đặt hàng</th>*/}
+                    {/*                <th className="py-2 px-4 border">Ngày giao hàng</th>*/}
+                    {/*                <th className="py-2 px-4 border">Tổng giá trị</th>*/}
+                    {/*                <th className="py-2 px-4 border">Trạng thái</th>*/}
+                    {/*                <th className="py-2 px-4 border">Action</th>*/}
+                    {/*            </tr>*/}
+                    {/*            </thead>*/}
+                    {/*            <tbody>*/}
+                    {/*            {orders.map((order) => (*/}
+                    {/*                <tr key={order._id}>*/}
+                    {/*                    <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>*/}
+                    {/*                    <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>*/}
+                    {/*                    <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>*/}
+                    {/*                    <td className="py-2 px-4 border">{order.total_price}</td>*/}
+                    {/*                    <td className="py-2 px-4 border">{order.status}</td>*/}
+                    {/*                    <td className="py-2 px-4 border">*/}
+                    {/*                        <div className="flex justify-center">*/}
+                    {/*                            <EditButton onClick={() => toggleModal(order)}*/}
+                    {/*                                        className="mr-2">Edit</EditButton>*/}
+                    {/*                            <DeleteButton onClick={() => handleDelete(order._id)}*/}
+                    {/*                                          className="">Delete</DeleteButton>*/}
+                    {/*                        </div>*/}
+                    {/*                    </td>*/}
+                    {/*                </tr>*/}
+                    {/*            ))}*/}
+                    {/*            </tbody>*/}
+                    {/*        </table>*/}
                 </div>
             )}
         </div>
     );
 }
-
 export default OrderList;

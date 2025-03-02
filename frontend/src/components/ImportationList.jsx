@@ -118,33 +118,37 @@ const ImportationList = () => {
                 <p>Loading...</p>
             ) : (
                 <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
-                    <table className="min-w-full bg-white">
-                        <thead className="sticky top-0 bg-white">
-                        <tr>
-                            <th className="py-2 px-4 border">Tên nhà cung cấp</th>
-                            <th className="py-2 px-4 border">Import Date</th>
-                            <th className="py-2 px-4 border">Total Price</th>
-                            <th className="py-2 px-4 border">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {importations.map((importation) => (
-                            <tr key={importation._id}>
-                                <td className="py-2 px-4 border">{supplierNames[importation.id_supplier]}</td>
-                                <td className="py-2 px-4 border">{formatDateTime(importation.import_date)}</td>
-                                <td className="py-2 px-4 border">{importation.total_price}</td>
-                                <td className="py-2 px-4 border">
-                                    <div className="flex justify-center">
-                                        <EditButton onClick={() => toggleModal(importation)}
-                                                    className="mr-2">Edit</EditButton>
-                                        <DeleteButton onClick={() => handleDelete(importation._id)}
-                                                      className="">Delete</DeleteButton>
-                                    </div>
-                                </td>
+                    <div className="overflow-x-auto">
+                        <table className="table bg-white">
+                            <thead>
+                            <tr>
+                                <th className="py-2 px-4 border">Tên nhà cung cấp</th>
+                                <th className="py-2 px-4 border">Import Date</th>
+                                <th className="py-2 px-4 border">Total Price</th>
+                                <th className="py-2 px-4 border">Action</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {importations.map((importation) => (
+                                <tr key={importation._id}>
+                                    <td className="py-2 px-4 border">{supplierNames[importation.id_supplier]}</td>
+                                    <td className="py-2 px-4 border">{formatDateTime(importation.import_date)}</td>
+                                    <td className="py-2 px-4 border">{importation.total_price}</td>
+                                    <td className="py-2 px-4 border">
+                                        <div className="flex justify-center">
+                                            <div className="flex justify-center">
+                                                <button onClick={() => toggleModal(importation)}
+                                                        className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             )}
         </div>

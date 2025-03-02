@@ -1,4 +1,4 @@
 roles = [
-    'Quản trị viên',
-    'Nhân viên',
+    {'key':'admin','name':'Quản trị viên'},
+    {'key':'staff','name':'Nhân viên'},
 ]

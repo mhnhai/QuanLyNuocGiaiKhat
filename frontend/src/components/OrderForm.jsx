@@ -21,6 +21,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
         status: '',
         order_items: [{ id_product: '', quantity: '', selling_price: '' }]
     });
+    const [initialStatus, setInitialStatus] = useState(order ? order.status : '');
     const [products, setProducts] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [payment_forms, setPayment_forms] = useState([]);
@@ -29,6 +30,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
     useEffect(() => {
         if (order) {
             setFormData(order);
+            setInitialStatus(order.status);
         }
     }, [order]);
 
@@ -164,26 +166,26 @@ const OrderForm = ({ order, onSave, onClose }) => {
             if (order?._id) {
                 response = await OrderService.update(order._id, updatedFormData);
             } else {
-                updatedFormData.status = statuses[0];
                 response = await OrderService.create(updatedFormData);
             }
 
             for (const item of updatedOrderItems) {
                 const product = await ProductService.getById(item.id_product);
                 if (product) {
-                    if(product.data.stock < item.quantity){
-                        alert("Số lượng không đủ, hãy giảm số lượng đặt hoặc đổi sản phẩm khác.")
+                    if (product && product.data.stock < item.quantity) {
+                        alert("Số lượng " + product.data.name + " không đủ, hãy giảm số lượng đặt hoặc đổi sản phẩm khác.");
                         return;
                     }
-                    const updatedProduct = {
-                        ...product.data,
-                        stock: product.data.stock - parseInt(item.quantity, 10)
-                    };
-                    await ProductService.update(product.data._id, updatedProduct);
+                    if(formData.status === 'Đang giao'){
+                        const updatedProduct = {
+                            ...product.data,
+                            stock: product.data.stock - parseInt(item.quantity, 10)
+                        };
+                        await ProductService.update(product.data._id, updatedProduct);
+                    }
                 }
             }
             onSave(response.data);
-
         } catch (error) {
             console.error('Error saving order:', error);
         }
@@ -195,15 +197,9 @@ const OrderForm = ({ order, onSave, onClose }) => {
         if (nextStatus && window.confirm(`Xác nhận ${nextStatus}?`)) {
             setFormData({
                 ...formData,
-                status: nextStatus
+                status: nextStatus,
+                shipping_date: currentIndex >= 0 ? new Date().toISOString() : formData.shipping_date
             });
-            if (currentIndex >= 0) {
-                setFormData({
-                    ...formData,
-                    shipping_date: new Date().toISOString(),
-                    status: nextStatus
-                });
-            }
         }
     };
 
@@ -320,7 +316,9 @@ const OrderForm = ({ order, onSave, onClose }) => {
                                        onChange={(e) => handleQuantityChange(index, e)} required
                                        disabled={!!order}
                                        className="mt-1 block w-20 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                       placeholder="Quantity"/>
+                                       placeholder="Quantity"
+                                       min="1"
+                                />
                             </td>
                             <td className="py-2 px-4 border">
                                 <input type="text" name="selling_price" value={product.selling_price} disabled
@@ -348,7 +346,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                         Hủy đơn
                     </DeleteButton>
                 )}
-                <Button type="submit">Lưu</Button>
+                <button className="btn btn-neutral" disabled={formData.status === initialStatus}>Lưu</button>
             </div>
         </form>
     );
