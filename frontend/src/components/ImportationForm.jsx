@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ImportationService from "../services/importation.service";
 import ProductService from "../services/product.service";
-import formatDateTime from "../utils/formatDateTime";
 import SupplierService from "../services/supplier.service";
 import Select from 'react-select';
 import { FaDeleteLeft } from "react-icons/fa6";
@@ -9,9 +8,10 @@ import { Button, DeleteButton, EditButton } from "./Button";
 import {IoMdAddCircleOutline, IoMdClose} from "react-icons/io";
 
 const ImportationForm = ({ importation, onSave, onClose }) => {
+    const user = JSON.parse(localStorage.getItem('user'));
     const [formData, setFormData] = useState(importation || {
         id_supplier: '',
-        id_staff: '',
+        id_staff: user.id,
         import_date: new Date().toISOString(),
         total_price: '',
         import_items: [{ id_product: '', quantity: '', import_price: '' }]
@@ -185,16 +185,19 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Nhân viên:</label>
-                    <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
-                           disabled={!!importation}
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-gray-700">Nhân viên tạo đơn:</label>
+                    <input type="hidden" name="id_staff" value={formData.id_staff} onChange={handleChange} required
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <input type="text" name="id_staff" value={user.name} onChange={handleChange} required
+                           disabled
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Ngày nhập:</label>
-                    <input type="date" name="import_date" value={formData.import_date.split('T')[0]} onChange={handleChange} required
+                    <input type="date" name="import_date" value={formData.import_date.split('T')[0]}
+                           onChange={handleChange} required
                            disabled={!!importation}
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Tổng cộng:</label>
@@ -218,7 +221,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                         <th className="py-2 px-4 border">Sản phẩm</th>
                         <th className="py-2 px-4 border">Số lượng</th>
                         <th className="py-2 px-4 border">Giá bán</th>
-                        <th className="py-2 px-4 border">Tổng cộng</th>
+                        <th className="py-2 px-4 border">Thành tiền</th>
                         {!importation && <th className="py-2 px-4 border">Hành động</th>}
                     </tr>
                     </thead>
@@ -264,9 +267,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
             </div>
             <div className="flex justify-end">
                 {!importation && (
-                    <Button type="submit">
-                        Lưu
-                    </Button>
+                    <button className="btn btn-neutral">Lưu</button>
                 )}
             </div>
 

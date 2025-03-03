@@ -9,7 +9,7 @@ const DateFilter = ({ onFilter }) => {
         <input
             type="date"
             onChange={handleChange}
-            className="input"
+            className="input input-sm input-accent"
         />
     );
 };

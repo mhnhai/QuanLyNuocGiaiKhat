@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
 import SupplierFilter from "./SupplierFilter";
+import { FaEye } from "react-icons/fa";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -98,8 +99,10 @@ const ProductList = () => {
             <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                    <label>Lọc theo nhà phân phối:</label>
+                <div className="flex items-center space-x-2 bg-base-100 p-3 rounded-lg shadow-lg">
+                    <span>Lọc theo nhà phân phối:</span>
                     <SupplierFilter onFilter={handleFilter}/>
+                </div>
                 <Button onClick={() => toggleModal()} className="flex-initial">Thêm sản phẩm</Button>
             </div>
             <Modal
@@ -135,7 +138,9 @@ const ProductList = () => {
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
                                         <button onClick={() => toggleModal(product)}
-                                                className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                                className="btn btn-sm btn-outline btn-info">
+                                            <FaEye/>
+                                            Xem chi tiết
                                         </button>
                                     </div>
                                 </td>

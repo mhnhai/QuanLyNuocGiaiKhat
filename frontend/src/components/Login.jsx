@@ -13,17 +13,12 @@ const Login = ({ onLogin }) => {
         const staff = await isStaff(username, password);
         if(!staff){
                 alert('Sai tên đăng nhập hoặc mật khẩu');
-        }  else if (staff.role_account==='admin') {
-            const user = { username, role: 'admin' };
+        }  else {
+            const user = {id: staff._id ,name: staff.name, role: staff.role_account};
             localStorage.setItem('user', JSON.stringify(user));
             onLogin();
             navigate('/');
-        } else {
-            const user = { username, role: 'staff' };
-            localStorage.setItem('user', JSON.stringify(user));
-            onLogin();
-            navigate('/');
-        };
+        }
     }
 
 

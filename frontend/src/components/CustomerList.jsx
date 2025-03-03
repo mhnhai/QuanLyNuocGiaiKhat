@@ -4,6 +4,7 @@ import CustomerForm from './CustomerForm';
 import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
+import {FaEye} from "react-icons/fa";
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
@@ -108,7 +109,9 @@ const CustomerList = () => {
                                     <td className="py-2 px-4 border">{customer.phone}</td>
                                     <td className="py-2 px-4 border">
                                         <div className="flex justify-center">
-                                            <button onClick={() => toggleModal(customer)} className="btn btn-sm btn-outline btn-info">Xem chi tiết</button>
+                                            <button onClick={() => toggleModal(customer)} className="btn btn-sm btn-outline btn-info">
+                                                <FaEye/>
+                                                Xem chi tiết</button>
                                         </div>
                                     </td>
                                 </tr>

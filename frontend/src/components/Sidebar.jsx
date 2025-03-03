@@ -5,7 +5,6 @@ import { FaBeer, FaUser, FaHome, FaCartPlus, FaCogs, FaUserTie, FaCartArrowDown,
 const Sidebar = () => {
     const location = useLocation();
     const user = JSON.parse(localStorage.getItem('user'));
-
     return (
         <div className="flex flex-col h-screen w-64 bg-gray-800 text-white shadow-lg">
             <div className="flex items-center justify-center h-16 border-b border-gray-700">
@@ -21,7 +20,7 @@ const Sidebar = () => {
                 <SidebarItem icon={<FaUser />} label="Nhà cung cấp" to="/suppliers" active={location.pathname === "/suppliers"} />
                 <SidebarItem icon={<FaCogs />} label="Cài đặt" to="/settings" active={location.pathname === "/settings"} />
             </nav>
-            <p className="p-2">Xin chào, {user.username}</p>
+            <p className="p-2">Xin chào, {user.name}</p>
             <SidebarItem icon={<FaSignOutAlt />} label="Đăng xuất" to="/logout" active={location.pathname === "/logout"} />
         </div>
     );

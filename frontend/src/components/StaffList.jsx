@@ -4,6 +4,7 @@ import StaffForm from "./StaffForm";
 import Modal from "react-modal";
 import {Button, DeleteButton, EditButton} from "./Button";
 import SearchBar from "./SearchBar";
+import {FaEye} from "react-icons/fa";
 
 const StaffList = () => {
     const [staffs, setStaffs] = useState([]);
@@ -112,7 +113,9 @@ const StaffList = () => {
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
                                         <button onClick={() => toggleModal(staff)}
-                                                className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                                className="btn btn-sm btn-outline btn-info">
+                                            <FaEye/>
+                                            Xem chi tiết
                                         </button>
 
                                     </div>

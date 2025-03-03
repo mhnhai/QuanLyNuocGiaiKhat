@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import OrderService from "../services/order.service";
 import CustomerService from "../services/customer.service";
 import ProductService from "../services/product.service";
@@ -11,9 +11,10 @@ import { IoMdAddCircleOutline, IoMdClose } from "react-icons/io";
 import Select from 'react-select';
 
 const OrderForm = ({ order, onSave, onClose }) => {
+    const user = JSON.parse(localStorage.getItem('user'));
     const [formData, setFormData] = useState(order || {
         id_customer: '',
-        id_staff: '',
+        id_staff: user.id,
         order_date: new Date().toISOString(),
         shipping_date: null,
         form_payment: '',
@@ -239,13 +240,16 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Staff ID:</label>
-                    <input type="text" name="id_staff" value={formData.id_staff} onChange={handleChange} required
-                           disabled={!!order}
+                    <label className="block text-sm font-medium text-gray-700">Nhân viên tạo đơn:</label>
+                    <input type="hidden" name="id_staff" value={formData.id_staff} onChange={handleChange} required
+                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <input type="text" name="id_staff" value={user.name} onChange={handleChange} required
+                           disabled
                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày tạo đơn: {formatDateTime(formData.order_date)}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày tạo
+                        đơn: {formatDateTime(formData.order_date)}</label>
                     <input type="hidden" name="order_date" value={formData.order_date}/>
                 </div>
                 <div>
@@ -294,7 +298,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                         <th className="py-2 px-4 border">Sản phẩm</th>
                         <th className="py-2 px-4 border">Số lượng</th>
                         <th className="py-2 px-4 border">Giá bán</th>
-                        <th className="py-2 px-4 border">Tổng cộng</th>
+                        <th className="py-2 px-4 border">Thành tiền</th>
                         {!order && <th className="py-2 px-4 border">Hành động</th>}
                     </tr>
                     </thead>

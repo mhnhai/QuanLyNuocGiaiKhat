@@ -6,6 +6,7 @@ import { Button, DeleteButton, EditButton } from "./Button";
 import SupplierService from "../services/supplier.service";
 import formatDateTime from "../utils/formatDateTime";
 import DateFilter from "./DateFilter";
+import {FaEye} from "react-icons/fa";
 
 const ImportationList = () => {
     const [importations, setImportations] = useState([]);
@@ -89,7 +90,7 @@ const ImportationList = () => {
     const modalStyles = {
         content: {
             width: '50%',
-            height: '80%',
+            height: '60%',
             margin: 'auto',
             padding: '20px',
         },
@@ -98,8 +99,8 @@ const ImportationList = () => {
     return (
         <div className="container pt-4">
             <h1 className="text-2xl font-bold mb-4">Danh sách đơn nhập hàng</h1>
-            <div className="flex justify-between mb-4">
-                <div className="flex items-center space-x-2">
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex shadow-lg items-center space-x-2 bg-base-100 p-3 rounded-lg">
                     <span>Lọc theo ngày:</span>
                     <DateFilter onFilter={handleDateFilter}/>
                 </div>
@@ -138,7 +139,9 @@ const ImportationList = () => {
                                         <div className="flex justify-center">
                                             <div className="flex justify-center">
                                                 <button onClick={() => toggleModal(importation)}
-                                                        className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                                        className="btn btn-sm btn-outline btn-info">
+                                                    <FaEye/>
+                                                    Xem chi tiết
                                                 </button>
                                             </div>
                                         </div>

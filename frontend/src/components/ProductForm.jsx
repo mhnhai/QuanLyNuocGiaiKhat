@@ -214,8 +214,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
                     ) : null}
                 </div>
             </div>
-            <div className="flex justify-center">
-                <Button type="submit">Lưu</Button>
+            <div className="flex justify-end">
+                <button className="btn btn-neutral">Lưu</button>
             </div>
         </form>
     );

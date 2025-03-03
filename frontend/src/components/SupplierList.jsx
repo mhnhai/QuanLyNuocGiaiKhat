@@ -4,6 +4,7 @@ import SupplierForm from "./SupplierForm";
 import Modal from "react-modal";
 import {Button, DeleteButton, EditButton} from "./Button";
 import SearchBar from "./SearchBar";
+import {FaEye} from "react-icons/fa";
 
 const SupplierList = () => {
     const [suppliers, setSuppliers] = useState([]);
@@ -67,7 +68,7 @@ const SupplierList = () => {
     const modalStyles = {
         content: {
             width: '50%', // Adjust the width as needed
-            height: '80%', // Adjust the height as needed
+            height: '40%', // Adjust the height as needed
             margin: 'auto', // Center the modal
             padding: '20px', // Add padding if needed
         },
@@ -108,7 +109,9 @@ const SupplierList = () => {
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
                                         <button onClick={() => toggleModal(supplier)}
-                                                className="btn btn-sm btn-outline btn-info">Xem chi tiết
+                                                className="btn btn-sm btn-outline btn-info">
+                                            <FaEye/>
+                                            Xem chi tiết
                                         </button>
                                     </div>
                                 </td>

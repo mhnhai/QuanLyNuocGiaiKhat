@@ -4,18 +4,15 @@ import revenueService from '../services/revenue.service';
 import costService from "../services/cost.service";
 
 const DataChart = () => {
+    const currentMonth = new Date().toISOString().slice(0, 7);
     const [period, setPeriod] = useState('month');
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState(currentMonth);
     const [revenueData, setRevenueData] = useState(null);
     const [costData, setCostData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
 
     const handleFetchData = async () => {
-        setLoading(true);
-        setError(null);
         try {
             const [revenueResponse, costResponse] = await Promise.all([
                 revenueService.getRevenue(period, value.replace(/-/g, '')),
@@ -23,12 +20,14 @@ const DataChart = () => {
             ]);
             setRevenueData(revenueResponse);
             setCostData(costResponse);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
+        } catch (e) {
+            console.error(e)
         }
     };
+
+    useEffect(() => {
+        handleFetchData();
+    }, []);
 
     useEffect(() => {
         if (revenueData && costData && chartRef.current) {
@@ -43,6 +42,7 @@ const DataChart = () => {
                 data: getChartData(),
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
                             display: true,
@@ -107,42 +107,48 @@ const DataChart = () => {
     };
 
     return (
-        <div>
-            <div className="card bg-base-100 w-96 shadow-lg p-4">
-                <p>Thống kê theo:</p>
-                <select className="select select-sm select-primary" value={period} onChange={(e) => setPeriod(e.target.value)}>
-                    <option value="month">Ngày trong tháng</option>
-                    <option value="year">Tháng trong năm</option>
-                    <option value="years">5 năm qua</option>
-                </select>
-                <p>Thời gian:</p>
-                {period === 'month' && (
-                    <input
-                        type="month"
-                        className="input input-primary input-sm"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                    />
-                )}
-                {period !== 'month' && (
-                    <input
-                        type="number"
-                        className="input input-primary input-sm"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                        min={2000}
-                        max={2100}
-                    />
-                )}
+        <div className="card mb-4 bg-base-100 shadow-lg p-6 w-full flex flex-col items-center">
+            <div className="flex justify-between items-center gap-3 mb-4 w-full">
+                <div className="flex">
+                    <p className="font-bold text-2xl">Biểu đồ thống kê</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <p>Thống kê theo:</p>
+                    <select
+                        className="select select-sm select-primary"
+                        value={period}
+                        onChange={(e) => setPeriod(e.target.value)}
+                    >
+                        <option value="month">Ngày trong tháng</option>
+                        <option value="year">Tháng trong năm</option>
+                        <option value="years">5 năm qua</option>
+                    </select>
+
+                    {period === 'month' ? (
+                        <input
+                            type="month"
+                            className="input input-primary input-sm"
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                        />
+                    ) : (
+                        <input
+                            type="number"
+                            placeholder="Nhập vào năm"
+                            className="input input-primary input-sm"
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                            min={2000}
+                            max={2100}
+                        />
+                    )}
+                    <button className="btn btn-primary btn-sm" onClick={handleFetchData}>Xem</button>
+                </div>
             </div>
-            <div>
-                <button onClick={handleFetchData}>Xem doanh thu</button>
-            </div>
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error.message}</p>}
+            {/* Biểu đồ */}
             {revenueData && costData && (
-                <div style={{width: '1000px', height: 'auto'}}>
-                    <canvas ref={chartRef}></canvas>
+                <div className="w-[1200px] max-w-full bg-white p-6 rounded-lg shadow-lg">
+                    <canvas ref={chartRef} style={{width: '100%', height: '500px'}}></canvas>
                 </div>
             )}
         </div>

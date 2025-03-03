@@ -229,7 +229,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                 </div>
             </div>
             <div className="flex justify-end space-x-2">
-                <Button type="submit">Lưu</Button>
+                <button className="btn btn-neutral">Lưu</button>
             </div>
         </form>
     );

@@ -10,13 +10,13 @@ const SearchBar = ({ onSearch }) => {
     };
 
     return (
-        <div className="flex w-96">
+        <div className="flex w-96 shadow-lg">
             <input
                 type="text"
                 value={searchTerm}
                 onChange={handleChange}
                 placeholder="Tìm kiếm..."
-                className="input input-md"
+                className="input input-md w-96"
             />
         </div>
     );
