@@ -8,7 +8,7 @@ const Sidebar = () => {
     return (
         <div className="flex flex-col h-screen w-64 bg-gray-800 text-white shadow-lg">
             <div className="flex items-center justify-center h-16 border-b border-gray-700">
-                <h1 className="text-2xl font-bold">Quản lý nước giải khát</h1>
+                <h1 className="text-xl font-bold">Quản lý nước giải khát</h1>
             </div>
             <nav className="flex-1 p-4 space-y-2">
                 <SidebarItem icon={<FaHome />} label="Trang chủ" to="/" active={location.pathname === "/"} />
@@ -16,8 +16,12 @@ const Sidebar = () => {
                 <SidebarItem icon={<FaUser />} label="Khách hàng" to="/customers" active={location.pathname === "/customers"} />
                 <SidebarItem icon={<FaCartPlus />} label="Đơn hàng" to="/orders" active={location.pathname === "/orders"} />
                 <SidebarItem icon={<FaCartArrowDown />} label="Nhập hàng" to="/importations" active={location.pathname === "/importations"} />
-                <SidebarItem icon={<FaUserTie />} label="Nhân viên" to="/staffs" active={location.pathname === "/staffs"} />
+                {user.role !== 'staff' && (
+                    <SidebarItem icon={<FaUserTie />} label="Nhân viên" to="/staffs" active={location.pathname === "/staffs"} />
+                )}
+                {user.role !== 'staff' && (
                 <SidebarItem icon={<FaUser />} label="Nhà cung cấp" to="/suppliers" active={location.pathname === "/suppliers"} />
+                )}
                 <SidebarItem icon={<FaCogs />} label="Cài đặt" to="/settings" active={location.pathname === "/settings"} />
             </nav>
             <p className="p-2">Xin chào, {user.name}</p>

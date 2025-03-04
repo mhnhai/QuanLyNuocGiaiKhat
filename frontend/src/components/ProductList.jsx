@@ -13,6 +13,7 @@ const ProductList = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [originalProducts, setOriginalProducts] = useState([]);
+    const user = JSON.parse(localStorage.getItem('user'));
 
     useEffect(() => {
         fetchProducts();
@@ -103,7 +104,7 @@ const ProductList = () => {
                     <span>Lọc theo nhà phân phối:</span>
                     <SupplierFilter onFilter={handleFilter}/>
                 </div>
-                <Button onClick={() => toggleModal()} className="flex-initial">Thêm sản phẩm</Button>
+                <button disabled={user.role === "staff"} onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm sản phẩm</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
@@ -137,7 +138,7 @@ const ProductList = () => {
                                 <td className="py-2 px-4 border">{product.stock}</td>
                                 <td className="py-2 px-4 border">
                                     <div className="flex justify-center">
-                                        <button onClick={() => toggleModal(product)}
+                                        <button disabled={user.role === "staff"} onClick={() => toggleModal(product)}
                                                 className="btn btn-sm btn-outline btn-info">
                                             <FaEye/>
                                             Xem chi tiết
