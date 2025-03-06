@@ -1,12 +1,27 @@
-import React from "react";
+import React, {useState} from "react";
 import { Link, useLocation } from "react-router-dom";
+import {FaUser} from "react-icons/fa";
+import { LuSunMedium } from "react-icons/lu";
+import { IoMoonOutline } from "react-icons/io5";
 
 const Navbar = () => {
-    return (
+    const [theme, setTheme] = useState("light");
 
+    const toggleTheme = () => {
+        const newTheme = theme === "light" ? "dark" : "light";
+        setTheme(newTheme);
+        document.documentElement.setAttribute("data-theme", newTheme);
+    };
+    const location = useLocation();
+    const user = JSON.parse(localStorage.getItem('user'));
+    return (
         <div className="navbar bg-base-100 shadow-sm">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl">daisyUI</a>
+                <div className="btn btn-ghost">
+                    <Link to={"/"}>
+                        Home
+                    </Link>
+                </div>
             </div>
             <div className="flex-none">
                 <div className="dropdown dropdown-end">
@@ -34,10 +49,8 @@ const Navbar = () => {
                 </div>
                 <div className="dropdown dropdown-end">
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                        <div className="w-10 rounded-full">
-                            <img
-                                alt="Tailwind CSS Navbar component"
-                                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"/>
+                        <div className="rounded-full">
+                            <FaUser size={20}/>
                         </div>
                     </div>
                     <ul
@@ -51,8 +64,22 @@ const Navbar = () => {
                         </li>
                         <li><a>Settings</a></li>
                         <li><a>Logout</a></li>
+
                     </ul>
                 </div>
+                <label className="swap swap-rotate">
+                    {/* this hidden checkbox controls the state */}
+                    <input onClick={toggleTheme} type="checkbox" className="theme-controller" value="synthwave"/>
+
+                    {/* sun icon */}
+                    <div className="swap-off h-10 w-10 fill-current">
+                        <LuSunMedium size={20}/>
+                    </div>
+                    {/* moon icon */}
+                    <div className="swap-on h-10 w-10 fill-current">
+                        <IoMoonOutline size={20}/>
+                    </div>
+                </label>
             </div>
         </div>
     )
