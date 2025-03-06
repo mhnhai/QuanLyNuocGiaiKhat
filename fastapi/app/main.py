@@ -4,6 +4,7 @@ from app.routers import customer, staff, product, supplier, order, importation, 
     
 origins =[
     "http://localhost:3000",
+    "http://localhost:3001",
 ]
 
 app = FastAPI()

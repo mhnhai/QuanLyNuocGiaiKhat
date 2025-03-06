@@ -1,0 +1,24 @@
+/* Add this CSS to your stylesheet */
+.modal-overlay {
+    @apply opacity-0 transition-opacity duration-300 ease-in-out;
+}
+
+.modal-overlay--after-open {
+    @apply opacity-100;
+}
+
+.modal-overlay--before-close {
+    @apply opacity-0;
+}
+
+.modal-content {
+    @apply transform translate-y-[-50px] transition-transform duration-300 ease-in-out;
+}
+
+.modal-content--after-open {
+    @apply translate-y-0;
+}
+
+.modal-content--before-close {
+    @apply translate-y-[-50px];
+}
