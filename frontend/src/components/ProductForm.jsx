@@ -125,6 +125,24 @@ const ProductForm = ({ product, onSave, onClose }) => {
         }
     };
 
+    const handleDeleteImage = async () => {
+        if (product?.image) {
+            try {
+                const response = await fetch(`http://localhost:8000/api/delete-image/${product.image}`, {
+                    method: 'DELETE',
+                });
+                if (response.ok) {
+                    setUploadedImageUrl('');
+                    formik.setFieldValue('image', '');
+                } else {
+                    console.error('Failed to delete image');
+                }
+            } catch (error) {
+                console.error('Error deleting image:', error);
+            }
+        }
+    };
+
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div className="flex justify-end">
@@ -280,6 +298,12 @@ const ProductForm = ({ product, onSave, onClose }) => {
                                 alt="Preview" 
                                 className="h-24 w-auto object-cover rounded-md"
                             />
+                            <button 
+                                onClick={handleDeleteImage} 
+                                className="mt-2 text-red-500 hover:text-red-600"
+                            >
+                                Xóa ảnh
+                            </button>
                         </div>
                     )}
                 </div>
