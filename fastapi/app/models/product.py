@@ -13,6 +13,7 @@ class ProductModel(BaseModel):
     volume: Union[str, None] = None
     origin: Union[str, None] = None
     description: Union[str, None] = None
+    image: Union[str, None] = None
 
     class Config:
         allow_population_by_field_name = True

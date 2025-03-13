@@ -4,8 +4,10 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import ProductService from "../services/product.service";
 import SupplierService from "../services/supplier.service";
+import CategoryService from "../services/category.service";
 import { Button } from "./Button";
 import {IoMdClose} from "react-icons/io";
+import uploadService from '../services/upload.service';
 
 const validationSchema = yup.object({
     id_supplier: yup.string().required('Nhập nhà cung cấp'),
@@ -16,9 +18,14 @@ const validationSchema = yup.object({
     volume: yup.string().required('Nhập dung tích sản phẩm'),
     origin: yup.string().required('Nhập nguồn gốc'),
     description: yup.string().required('Nhập mô tả'),
+    image: yup.string().required('Nhập ảnh'),
 });
 
 const ProductForm = ({ product, onSave, onClose }) => {
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
+    const [imageLoading, setImageLoading] = useState(false);
+    
     const formik = useFormik({
         initialValues: {
             id_supplier: '',
@@ -30,33 +37,45 @@ const ProductForm = ({ product, onSave, onClose }) => {
             volume: '',
             origin: '',
             description: '',
+            image: '',
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
+                setImageLoading(true);
+                
+                // If we have a new image file, upload it first
+                if (imageFile) {
+                    const uploadResponse = await uploadService.uploadImage(imageFile);
+                    // Assuming the server returns the filename or full path
+                    values.image = uploadResponse.data.filename || uploadResponse.data;
+                }
+                
                 let response;
                 if (product) {
                     response = await ProductService.update(product._id, values);
                 } else {
                     response = await ProductService.create(values);
                 }
+                setImageLoading(false);
                 onSave(response.data);
             } catch (error) {
+                setImageLoading(false);
                 console.error('Error saving product:', error);
             }
         },
     });
 
-    const categories = [
-        { key: 'barrel', name: 'Thùng' },
-        { key: 'pack', name: 'Lốc 6 lon' },
-    ];
-
+    const [categories, setCategories] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
 
     useEffect(() => {
         if (product) {
             formik.setValues(product);
+            // If product has an image, set the preview
+            if (product.image) {
+                setImagePreview(product.image);
+            }
         }
     }, [product]);
 
@@ -73,10 +92,37 @@ const ProductForm = ({ product, onSave, onClose }) => {
             }
         };
         fetchSuppliers();
+        const fetchCategories = async () => {
+            try {
+                const response = await CategoryService.getCategories();
+                setCategories(response);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
     }, []);
 
     const handleSupplierChange = (selectedOption) => {
         formik.setFieldValue('id_supplier', selectedOption ? selectedOption.value : '');
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Save the file for later upload
+            setImageFile(file);
+            
+            // Create a preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            
+            // Update the form field to satisfy validation
+            formik.setFieldValue('image', 'pending_upload');
+        }
     };
 
     return (
@@ -153,7 +199,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
                     >
                         <option value="">-- Chọn loại hàng --</option>
                         {categories.map((category) => (
-                            <option key={category.key} value={category.name}>{category.name}</option>
+                            <option key={category} value={category}>{category}</option>
                         ))}
                     </select>
                     {formik.touched.category && formik.errors.category ? (
@@ -200,7 +246,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
                         <p className="text-red-500 text-xs mt-1">{formik.errors.origin}</p>
                     ) : null}
                 </div>
-                <div>
+                <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Mô tả:</label>
                     <textarea
                         name="description"
@@ -213,9 +259,39 @@ const ProductForm = ({ product, onSave, onClose }) => {
                         <p className="text-red-500 text-xs mt-1">{formik.errors.description}</p>
                     ) : null}
                 </div>
+                <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700">Ảnh:</label>
+                    <input
+                        type="file"
+                        name="imageFile"
+                        onChange={handleImageChange}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        accept="image/*"
+                    />
+                    {formik.touched.image && formik.errors.image ? (
+                        <p className="text-red-500 text-xs mt-1">{formik.errors.image}</p>
+                    ) : null}
+                    
+                    {/* Image Preview */}
+                    {imagePreview && (
+                        <div className="mt-2">
+                            <img 
+                                src={imagePreview.startsWith('data:') ? imagePreview : uploadService.getImageUrl(imagePreview)} 
+                                alt="Preview" 
+                                className="h-24 w-auto object-cover rounded-md"
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="flex justify-end">
-                <button className="btn btn-neutral">Lưu</button>
+                <button 
+                    type="submit" 
+                    className="btn btn-neutral"
+                    disabled={imageLoading || formik.isSubmitting}
+                >
+                    {imageLoading ? 'Đang tải...' : 'Lưu'}
+                </button>
             </div>
         </form>
     );

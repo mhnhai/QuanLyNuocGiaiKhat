@@ -21,10 +21,18 @@ async def count_products():
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/products", response_model=List[ProductModel], tags=["Products"])
-async def read_products():
+async def read_products(sort_by: str = "stock", order: int = -1):
     try:
         products = []
-        async for product in products_collection.find():
+        # Validate sort parameters
+        valid_sort_fields = ["stock", "name", "import_price", "selling_price"]
+        if sort_by not in valid_sort_fields:
+            sort_by = "stock"
+        if order not in [-1, 1]:
+            order = -1
+            
+        cursor = products_collection.find().sort(sort_by, order)
+        async for product in cursor:
             product["_id"] = str(product["_id"])  # Convert ObjectId to string
             products.append(ProductModel(**product))
         return products
@@ -44,6 +52,19 @@ async def read_product(product_id: str):
         return ProductModel(**product)
     except Exception as e:
         logger.error(f"Error retrieving product with id {product_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+@router.get("/products/{product_id}/name", response_model=dict, tags=["Products"])
+async def get_product_name(product_id: str):
+    try:
+        if not ObjectId.is_valid(product_id):
+            raise HTTPException(status_code=400, detail="Invalid ObjectId")
+        product = await products_collection.find_one({"_id": ObjectId(product_id)}, {"name": 1})
+        if product is None:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"name": product["name"]}
+    except Exception as e:
+        logger.error(f"Error retrieving product name with id {product_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/products", response_model=ProductModel, tags=["Products"])

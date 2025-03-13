@@ -40,7 +40,7 @@ const OrderList = () => {
             if (order.id_customer && !names[order.id_customer]) {
                 try {
                     const response = await CustomerService.getById(order.id_customer);
-                    names[order.id_customer] = response.data.fullname;
+                    names[order.id_customer] = response.data.name;
                 } catch (error) {
                     console.error(`Error fetching customer with id ${order.id_customer}:`, error);
                 }

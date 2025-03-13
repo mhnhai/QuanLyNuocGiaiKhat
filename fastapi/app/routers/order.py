@@ -4,12 +4,23 @@ from app.database import orders_collection
 from app.models.order import OrderModel
 from bson import ObjectId
 import logging
-from datetime import datetime, date
 
 router = APIRouter()
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+@router.get("/orders/customer/{id_customer}", response_model=List[OrderModel], tags=["Orders"])
+async def get_orders_by_customer(id_customer: str):
+    try:
+        orders = []
+        async for order in orders_collection.find({"id_customer": id_customer}):
+            order["_id"] = str(order["_id"])  # Convert ObjectId to string
+            orders.append(OrderModel(**order))
+        return orders
+    except Exception as e:
+        logger.error(f"Error retrieving orders: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/orders/count", response_model=dict,  tags=["Orders"])
 async def count_orders():

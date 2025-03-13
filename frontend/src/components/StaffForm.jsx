@@ -14,7 +14,6 @@ const validationSchema = yup.object({
     password: yup.string().required('Hãy nhập mật khẩu'),
     position: yup.string().required('Hãy chọn vị trí công việc'),
     salary: yup.number().required('Salary is required').positive('Salary must be a positive number'),
-    birth_date: yup.date().required('Birth Date is required'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
     role_account: yup.string().required('Hãy chọn vai trò cho tài khoản'),
     address: yup.string().required('Hãy nhập địa chỉ'),
@@ -28,7 +27,6 @@ const StaffForm = ({ staff, onSave, onClose }) => {
             password: '',
             position: '',
             salary: '',
-            birth_date: '',
             phone: '',
             role_account: '',
             address: '',
@@ -172,20 +170,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                         <p className="text-red-500 text-xs mt-1">{formik.errors.salary}</p>
                     ) : null}
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Birth Date:</label>
-                    <input
-                        type="date"
-                        name="birth_date"
-                        value={formik.values.birth_date.split('T')[0]}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
-                    {formik.touched.birth_date && formik.errors.birth_date ? (
-                        <p className="text-red-500 text-xs mt-1">{formik.errors.birth_date}</p>
-                    ) : null}
-                </div>
+               
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Phone:</label>
                     <input
