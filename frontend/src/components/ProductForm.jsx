@@ -24,7 +24,6 @@ const validationSchema = yup.object({
 const ProductForm = ({ product, onSave, onClose }) => {
     const [imagePreview, setImagePreview] = useState(null);
     const [imageFile, setImageFile] = useState(null);
-    const [imageLoading, setImageLoading] = useState(false);
     
     const formik = useFormik({
         initialValues: {
@@ -42,26 +41,42 @@ const ProductForm = ({ product, onSave, onClose }) => {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
-                setImageLoading(true);
+                let imageUrl = values.image;
                 
                 // If we have a new image file, upload it first
                 if (imageFile) {
                     const uploadResponse = await uploadService.uploadImage(imageFile);
-                    // Assuming the server returns the filename or full path
-                    values.image = uploadResponse.data.filename || uploadResponse.data;
+                    // Handle different response structures
+                    imageUrl = uploadResponse.data?.filename || uploadResponse.data || uploadResponse;
+                    
+                    // If this is an update and we have an old image, delete it
+                    if (product?.image) {
+                        try {
+                            await uploadService.deleteImage(product.image);
+                        } catch (error) {
+                            console.error('Error deleting old image:', error);
+                        }
+                    }
                 }
-                
+
                 let response;
                 if (product) {
-                    response = await ProductService.update(product._id, values);
+                    response = await ProductService.update(product._id, { ...values, image: imageUrl.filename });
                 } else {
-                    response = await ProductService.create(values);
+                    response = await ProductService.create({ ...values, image: imageUrl.filename });
                 }
-                setImageLoading(false);
                 onSave(response.data);
             } catch (error) {
-                setImageLoading(false);
                 console.error('Error saving product:', error);
+                // If we uploaded a new image but the product creation/update failed,
+                // we should delete the newly uploaded image
+                if (imageFile && product?.image) {
+                    try {
+                        await uploadService.deleteImage(product.image);
+                    } catch (deleteError) {
+                        console.error('Error cleaning up uploaded image:', deleteError);
+                    }
+                }
             }
         },
     });
@@ -72,9 +87,8 @@ const ProductForm = ({ product, onSave, onClose }) => {
     useEffect(() => {
         if (product) {
             formik.setValues(product);
-            // If product has an image, set the preview
             if (product.image) {
-                setImagePreview(product.image);
+                setImagePreview(uploadService.getImageUrl(product.image));
             }
         }
     }, [product]);
@@ -110,17 +124,14 @@ const ProductForm = ({ product, onSave, onClose }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Save the file for later upload
             setImageFile(file);
-            
             // Create a preview
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
-            
-            // Update the form field to satisfy validation
+            // Set a temporary value for validation
             formik.setFieldValue('image', 'pending_upload');
         }
     };
@@ -128,19 +139,14 @@ const ProductForm = ({ product, onSave, onClose }) => {
     const handleDeleteImage = async () => {
         if (product?.image) {
             try {
-                const response = await fetch(`http://localhost:8000/api/delete-image/${product.image}`, {
-                    method: 'DELETE',
-                });
-                if (response.ok) {
-                    setUploadedImageUrl('');
-                    formik.setFieldValue('image', '');
-                } else {
-                    console.error('Failed to delete image');
-                }
+                await uploadService.deleteImage(product.image);
             } catch (error) {
                 console.error('Error deleting image:', error);
             }
         }
+        setImagePreview(null);
+        setImageFile(null);
+        formik.setFieldValue('image', '');
     };
 
     return (
@@ -279,22 +285,22 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 </div>
                 <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Ảnh:</label>
+                    {!imagePreview && (
                     <input
                         type="file"
                         name="imageFile"
                         onChange={handleImageChange}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         accept="image/*"
-                    />
+                    />)}
                     {formik.touched.image && formik.errors.image ? (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.image}</p>
                     ) : null}
                     
-                    {/* Image Preview */}
                     {imagePreview && (
                         <div className="mt-2">
                             <img 
-                                src={imagePreview.startsWith('data:') ? imagePreview : uploadService.getImageUrl(imagePreview)} 
+                                src={imagePreview} 
                                 alt="Preview" 
                                 className="h-24 w-auto object-cover rounded-md"
                             />
@@ -312,9 +318,9 @@ const ProductForm = ({ product, onSave, onClose }) => {
                 <button 
                     type="submit" 
                     className="btn btn-neutral"
-                    disabled={imageLoading || formik.isSubmitting}
+                    disabled={formik.isSubmitting}
                 >
-                    {imageLoading ? 'Đang tải...' : 'Lưu'}
+                     Lưu
                 </button>
             </div>
         </form>

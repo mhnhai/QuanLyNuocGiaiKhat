@@ -23,14 +23,9 @@ async def get_image(filename: str):
     file_path = os.path.join(IMAGE_PATH, filename)
     return FileResponse(file_path)
 
-from fastapi import APIRouter, HTTPException
-import os
-
-router = APIRouter()
-
 @router.delete("/upload-image/{filename}")
 async def delete_image(filename: str):
-    image_path = f"img/products/{filename}"
+    image_path = f"{IMAGE_PATH}{filename}"
     if os.path.exists(image_path):
         os.remove(image_path)
         return {"message": "Image deleted successfully"}

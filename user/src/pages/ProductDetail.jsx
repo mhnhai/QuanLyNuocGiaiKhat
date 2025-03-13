@@ -102,7 +102,7 @@ const ProductDetail = () => {
                         <img 
                             src={uploadService.getImageUrl(product.image)} 
                             alt={product.name} 
-                            className="rounded-xl w-full object-cover"
+                            className="rounded-xl w-auto h-96 object-cover"
                         />
                     </figure>
                 </div>

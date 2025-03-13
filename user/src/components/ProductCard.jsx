@@ -50,7 +50,7 @@ const ProductCard = ({ product }) => {
                         <img 
                             src={uploadService.getImageUrl(product.image)} 
                             alt={product.name}
-                            className="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-300"
+                            className="h-48 w-96 object-cover transform group-hover:scale-110 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-2">

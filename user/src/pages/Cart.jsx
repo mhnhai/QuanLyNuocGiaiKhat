@@ -177,7 +177,6 @@ const Cart = () => {
                                                     <p className="opacity-75">Số lượng: {item.quantity}</p>
                                                 </div>
                                             </div>
-                                            <p className="mt-2 text-sm opacity-75">{item.description}</p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xl font-bold text-primary">{item.selling_price.toLocaleString()} VND</p>
