@@ -80,7 +80,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
             </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Name:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tên khách hàng:</label>
                     <input
                         type="text"
                         name="name"
@@ -94,7 +94,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Username:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tên tài khoản:</label>
                     <input
                         type="text"
                         name="username"
@@ -108,7 +108,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Password:</label>
+                    <label className="block text-sm font-medium text-gray-700">Mật khẩu:</label>
                     <input
                         type="password"
                         name="password"
@@ -122,7 +122,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                    <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
                     <input
                         type="text"
                         name="phone"
@@ -136,7 +136,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Role Customer:</label>
+                    <label className="block text-sm font-medium text-gray-700">Vai trò:</label>
                     <Select
                         value={roles.find(option => option.value === formik.values.role_account)}
                         onChange={handleRoleChange}
@@ -150,7 +150,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Address:</label>
+                    <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
                     <input
                         type="text"
                         name="address"

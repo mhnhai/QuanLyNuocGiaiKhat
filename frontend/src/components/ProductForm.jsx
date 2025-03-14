@@ -306,7 +306,7 @@ const ProductForm = ({ product, onSave, onClose }) => {
                             />
                             <button 
                                 onClick={handleDeleteImage} 
-                                className="mt-2 text-red-500 hover:text-red-600"
+                                className="btn btn-sm btn-outline btn-error mt-4"
                             >
                                 Xóa ảnh
                             </button>
