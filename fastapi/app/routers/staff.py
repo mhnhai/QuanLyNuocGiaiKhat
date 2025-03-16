@@ -36,6 +36,19 @@ async def read_staff(staff_id: str):
     except Exception as e:
         logger.error(f"Error retrieving staff with id {staff_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+@router.get("/staffs/{staff_id}/name", response_model=dict, tags=["Staffs"])
+async def get_staff_name(staff_id: str): 
+    try:
+        if not ObjectId.is_valid(staff_id):
+            raise HTTPException(status_code=400, detail="Invalid ObjectId")
+        staff = await staffs_collection.find_one({"_id": ObjectId(staff_id)}, {"name": 1})
+        if staff is None:
+            raise HTTPException(status_code=404, detail="Staff not found")
+        return {"name": staff["name"]}
+    except Exception as e:
+        logger.error(f"Error retrieving staff name with id {staff_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/staffs", response_model=StaffModel, tags=["Staffs"])
 async def create_staff(staff: StaffModel):
@@ -58,10 +71,6 @@ async def update_staff(staff_id: str, staff: StaffModel):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
         
         staff_dict = staff.dict(by_alias=True, exclude_unset=True)
-        
-        # Convert datetime.date to datetime.datetime
-        if isinstance(staff_dict.get('birth_date'), date):
-            staff_dict['birth_date'] = datetime.combine(staff_dict['birth_date'], datetime.min.time())
         
         if "_id" in staff_dict:
             del staff_dict["_id"]  # Remove the _id field from the update data

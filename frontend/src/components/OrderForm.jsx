@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import OrderService from "../services/order.service";
 import CustomerService from "../services/customer.service";
 import ProductService from "../services/product.service";
@@ -9,6 +9,7 @@ import { Button, DeleteButton } from "./Button";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { IoMdAddCircleOutline, IoMdClose } from "react-icons/io";
 import Select from 'react-select';
+import staffService from '../services/staff.service';
 
 const OrderForm = ({ order, onSave, onClose }) => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -22,18 +23,12 @@ const OrderForm = ({ order, onSave, onClose }) => {
         status: '',
         order_items: [{ id_product: '', quantity: '', selling_price: '' }]
     });
+    const [staffName, setStaffName] = useState('');
     const [initialStatus, setInitialStatus] = useState(order ? order.status : '');
     const [products, setProducts] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [payment_forms, setPayment_forms] = useState([]);
     const [customers, setCustomers] = useState([]);
-
-    useEffect(() => {
-        if (order) {
-            setFormData(order);
-            setInitialStatus(order.status);
-        }
-    }, [order]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +39,12 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     payment_formService.getPaymentForms(),
                     CustomerService.getAll(),
                 ]);
+
+                if (order) {
+                    setFormData(order);
+                    setInitialStatus(order.status);
+                }
+
                 setProducts(productsResponse.data.map(product => ({
                     value: product._id,
                     label: product.name,
@@ -56,12 +57,15 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     value: customer._id,
                     label: customer.name
                 })));
+
+                const name = await staffService.getStaffName(order?.id_staff || user.id);
+                setStaffName(name);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
         fetchData();
-    }, []);
+    }, [order]);
 
     const calculateTotalPrice = (orderItems) => {
         return orderItems.reduce((total, item) => {
@@ -241,11 +245,9 @@ const OrderForm = ({ order, onSave, onClose }) => {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Nhân viên tạo đơn:</label>
-                    <input type="hidden" name="id_staff" value={formData.id_staff} onChange={handleChange} required
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
-                    <input type="text" name="id_staff" value={user.name} onChange={handleChange} required
-                           disabled
-                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                    <input type="hidden" name="id_staff" value={formData.id_staff} />
+                    <input type="text" value={staffName || ''} disabled
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Ngày tạo

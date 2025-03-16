@@ -28,6 +28,11 @@ const CustomerForm = ({ customer }) => {
         onSubmit: async (values) => {
             try {
                 let response;
+                const isRegistered = await CustomerService.checkRegistered(values.username);
+                if (isRegistered) {
+                    alert('Tên tài khoản đã tồn tại');
+                    return;
+                }
                 response = await CustomerService.create(values);
                 
                 navigate('/login');

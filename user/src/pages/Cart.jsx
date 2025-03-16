@@ -13,8 +13,8 @@ const Cart = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        id_customer: user.id,
-        id_staff: user.id,
+        id_customer: '',
+        id_staff: '',
         order_date: new Date().toISOString(),
         shipping_date: null,
         form_payment: '',
@@ -93,6 +93,11 @@ const Cart = () => {
             alert('Vui lòng điền đầy đủ thông tin.');
             return;
         }
+        if(!user){
+            alert('Vui lòng đăng nhập để đặt hàng');
+            return;
+        }
+        formData.id_customer = user.id;
 
         // Check for stock errors before submitting
         if (stockErrors.length > 0) {

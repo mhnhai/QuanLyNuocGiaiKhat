@@ -45,14 +45,14 @@ const Login = ({ onLogin }) => {
                         required
                     />
                 </div>
-                <div className="mb-4">
+                <button type="submit" className="w-full btn btn-primary">Đăng nhập</button>
+                <div className="mt-4">
                     <Link to={"/register"}>
                         <button className='btn w-full'>
                             Chưa có tài khoản? Đăng ký ngay!
                         </button>
                     </Link>
                 </div>
-                <button type="submit" className="w-full btn btn-primary">Đăng nhập</button>
             </form>
         </div>
     );

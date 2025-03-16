@@ -14,7 +14,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
     const user = JSON.parse(localStorage.getItem('user'));
     const [formData, setFormData] = useState(order || {
         id_customer: '',
-        id_staff: user.id,
+        id_staff: '',
         order_date: new Date().toISOString(),
         shipping_date: null,
         form_payment: '',
@@ -141,10 +141,13 @@ const OrderForm = ({ order, onSave, onClose }) => {
             alert("Phải có ít nhất 1 sản phẩm trong đơn.");
             return;
         }
+        if(!formData.id_staff){
+            formData.id_staff = user.id;
+        }
 
         for (const item of formData.order_items) {
             if (!item.id_product || !item.quantity || !item.selling_price) {
-                alert("All product fields must be filled.");
+                alert("Hãy điền đầy đủ thông tin.");
                 return;
             }
         }

@@ -13,6 +13,16 @@ class StaffService {
         }
     }
 
+    async getStaffName(staffId){
+        try {
+            const response = await axios.get(`${API_URL}/${staffId}/name`);
+            return response.data.name;
+        } catch (error) {
+            console.error(`Error fetching staff with id ${staffId}:`, error);
+            throw error;
+        }
+    }
+
     async getById(staffId) {
         try {
             const response = await axios.get(`${API_URL}/${staffId}`);

@@ -13,6 +13,16 @@ class CustomerService {
         }
     }
 
+    async checkRegistered(username) {
+        try {
+            const response = await axios.get(`${API_URL}/check-registered?username=${username}`);
+            return response.data.registered;
+        } catch (error) {
+            console.error('Error checking if customer is registered:', error);  
+            throw error;
+        }
+    }
+
     async getAll() {
         try {
             const response = await axios.get(API_URL);

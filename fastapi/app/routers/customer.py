@@ -9,6 +9,15 @@ router = APIRouter()
 
 # Configure logging
 logger = logging.getLogger(__name__)
+# endpoint to check if the customer is already registered
+@router.get("/customers/check-registered", response_model=dict, tags=["Customers"])
+async def check_registered(username: str):
+    try:
+        customer = await customers_collection.find_one({"username": username})
+        return {"registered": customer is not None}  
+    except Exception as e:
+        logger.error(f"Error checking if customer is registered: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/customers/count", response_model=dict,  tags=["Customers"])
 async def count_customers():
