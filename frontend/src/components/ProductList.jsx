@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import ProductService from "../services/product.service";
 import ProductForm from "./ProductForm";
 import Modal from "react-modal";
-import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
 import SupplierFilter from "./SupplierFilter";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaTrash } from "react-icons/fa";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -88,16 +87,14 @@ const ProductList = () => {
     const modalStyles = {
         content: {
             width: '50%',
-            height: '45%',
+            height: '82%',
             margin: 'auto',
             padding: '20px',
         },
     };
 
     return (
-
         <div className="container pt-4">
-            <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
                 <div className="flex items-center space-x-2 bg-base-100 p-3 rounded-lg shadow-lg">
@@ -106,6 +103,7 @@ const ProductList = () => {
                 </div>
                 <button disabled={user.role === "staff"} onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm sản phẩm</button>
             </div>
+            <h2 className="text-2xl font-bold mb-4">Danh sách sản phẩm</h2>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={toggleModal}
@@ -116,7 +114,7 @@ const ProductList = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="overflow-auto" style={{maxHeight: '72vh'}}>
+                <div className="overflow-auto" style={{maxHeight: '69vh'}}>
                     <table className="table bg-white">
                         <thead>
                         <tr>
@@ -137,11 +135,16 @@ const ProductList = () => {
                                 <td className="py-2 px-4 border">{product.selling_price}</td>
                                 <td className="py-2 px-4 border">{product.stock}</td>
                                 <td className="py-2 px-4 border">
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center gap-2">
                                         <button disabled={user.role === "staff"} onClick={() => toggleModal(product)}
                                                 className="btn btn-sm btn-outline btn-info">
                                             <FaEye/>
                                             Xem chi tiết
+                                        </button>
+                                        <button disabled={user.role === "staff"} onClick={() => handleDelete(product._id)}
+                                                className="btn btn-sm btn-outline btn-error">
+                                            <FaTrash/>
+                                            Xóa
                                         </button>
                                     </div>
                                 </td>

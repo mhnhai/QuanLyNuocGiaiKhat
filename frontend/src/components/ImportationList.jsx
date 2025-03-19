@@ -118,7 +118,7 @@ const ImportationList = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
+                <div className="overflow-auto" style={{ maxHeight: '69vh' }}>
                     <div className="overflow-x-auto">
                         <table className="table bg-white">
                             <thead>

@@ -94,7 +94,7 @@ const StaffList = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="overflow-auto" style={{ maxHeight: '72vh' }}>
+                <div className="overflow-auto" style={{ maxHeight: '69vh' }}>
                     <table className="table bg-white">
                         <thead>
                         <tr>

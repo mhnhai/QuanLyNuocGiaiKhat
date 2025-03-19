@@ -7,7 +7,7 @@ import formatDateTime from "../utils/formatDateTime";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
 import DateFilter from "./DateFilter";
-import {FaEye} from "react-icons/fa";
+import {FaEye, FaTrash} from "react-icons/fa";
 
 const OrderList = () => {
     const [orders, setOrders] = useState([]);
@@ -131,7 +131,7 @@ const OrderList = () => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <div className="overflow-auto" style={{maxHeight: '72vh'}}>
+                <div className="overflow-auto" style={{maxHeight: '69vh'}}>
                     <div className="overflow-x-auto">
                         <table className="table bg-white">
                             <thead>
@@ -159,6 +159,11 @@ const OrderList = () => {
                                                 <FaEye/>
                                                 Xem chi tiết
                                             </button>
+                                            <button onClick={() => handleDelete(order._id)}
+                                                    className="btn btn-sm btn-outline btn-error">
+                                                <FaTrash/>
+                                                Xóa
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -166,38 +171,6 @@ const OrderList = () => {
                             </tbody>
                         </table>
                     </div>
-                    {/*    <div className="overflow-auto" style={{maxHeight: '72vh'}}>*/}
-                    {/*        <table className="min-w-full bg-white">*/}
-                    {/*            <thead className="sticky top-0 bg-gray-400">*/}
-                    {/*            <tr>*/}
-                    {/*                <th className="py-2 px-4 border">Tên khách hàng</th>*/}
-                    {/*                <th className="py-2 px-4 border">Ngày đặt hàng</th>*/}
-                    {/*                <th className="py-2 px-4 border">Ngày giao hàng</th>*/}
-                    {/*                <th className="py-2 px-4 border">Tổng giá trị</th>*/}
-                    {/*                <th className="py-2 px-4 border">Trạng thái</th>*/}
-                    {/*                <th className="py-2 px-4 border">Action</th>*/}
-                    {/*            </tr>*/}
-                    {/*            </thead>*/}
-                    {/*            <tbody>*/}
-                    {/*            {orders.map((order) => (*/}
-                    {/*                <tr key={order._id}>*/}
-                    {/*                    <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>*/}
-                    {/*                    <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>*/}
-                    {/*                    <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>*/}
-                    {/*                    <td className="py-2 px-4 border">{order.total_price}</td>*/}
-                    {/*                    <td className="py-2 px-4 border">{order.status}</td>*/}
-                    {/*                    <td className="py-2 px-4 border">*/}
-                    {/*                        <div className="flex justify-center">*/}
-                    {/*                            <EditButton onClick={() => toggleModal(order)}*/}
-                    {/*                                        className="mr-2">Edit</EditButton>*/}
-                    {/*                            <DeleteButton onClick={() => handleDelete(order._id)}*/}
-                    {/*                                          className="">Delete</DeleteButton>*/}
-                    {/*                        </div>*/}
-                    {/*                    </td>*/}
-                    {/*                </tr>*/}
-                    {/*            ))}*/}
-                    {/*            </tbody>*/}
-                    {/*        </table>*/}
                 </div>
             )}
         </div>

@@ -4,7 +4,7 @@ import CustomerForm from './CustomerForm';
 import Modal from "react-modal";
 import { Button, DeleteButton, EditButton } from "./Button";
 import SearchBar from "./SearchBar";
-import {FaEye} from "react-icons/fa";
+import {FaEye, FaTrash} from "react-icons/fa";
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
@@ -76,10 +76,9 @@ const CustomerList = () => {
 
     return (
         <div className="container pt-4">
-            <h1 className="text-2xl font-bold mb-4">Danh sách khách hàng</h1>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <Button onClick={() => toggleModal()} className="flex-initial">Thêm khách hàng</Button>
+                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Tạo khách hàng</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
@@ -90,7 +89,9 @@ const CustomerList = () => {
                     <CustomerForm customer={selectedCustomer} onSave={handleCustomerSave} onClose={toggleModal}/>
                 </div>
             </Modal>
-            <div className="overflow-auto" style={{maxHeight: '72vh'}}>
+            <h1 className="text-2xl font-bold mb-4">Danh sách khách hàng</h1>
+
+            <div className="overflow-auto" style={{maxHeight: '69vh'}}>
                 <div className="overflow-x-auto">
                     <table className="table bg-white">
                         <thead>
@@ -108,10 +109,13 @@ const CustomerList = () => {
                                     <td className="py-2 px-4 border">{customer.address}</td>
                                     <td className="py-2 px-4 border">{customer.phone}</td>
                                     <td className="py-2 px-4 border">
-                                        <div className="flex justify-center">
+                                        <div className="flex justify-center gap-2">
                                             <button onClick={() => toggleModal(customer)} className="btn btn-sm btn-outline btn-info">
                                                 <FaEye/>
                                                 Xem chi tiết</button>
+                                            <button onClick={() => handleDelete(customer._id)} className="btn btn-sm btn-outline btn-error">
+                                                <FaTrash/>
+                                                Xóa</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -119,32 +123,6 @@ const CustomerList = () => {
                         </tbody>
                     </table>
                 </div>
-                {/*<table className="min-w-full bg-white">*/}
-                {/*    <thead className="sticky top-0 bg-white">*/}
-                {/*    <tr>*/}
-                {/*        <th className="py-2 px-4 border">Họ tên</th>*/}
-                {/*        <th className="py-2 px-4 border">Địa chỉ</th>*/}
-                {/*        <th className="py-2 px-4 border">Số điện thoại</th>*/}
-                {/*        <th className="py-2 px-4 border">Hành động</th>*/}
-                {/*    </tr>*/}
-                {/*    </thead>*/}
-                {/*    <tbody>*/}
-                {/*    {customers.map((customer) => (*/}
-                {/*        <tr key={customer._id}>*/}
-                {/*            <td className="py-2 px-4 border">{customer.fullname}</td>*/}
-                {/*            <td className="py-2 px-4 border">{customer.address}</td>*/}
-                {/*            <td className="py-2 px-4 border">{customer.phone}</td>*/}
-                {/*            <td className="py-2 px-4 border">*/}
-                {/*                <div className="flex justify-center">*/}
-                {/*                    <EditButton onClick={() => toggleModal(customer)} className="mr-2">Edit</EditButton>*/}
-                {/*                    <DeleteButton onClick={() => handleDelete(customer._id)}*/}
-                {/*                                  className="">Delete</DeleteButton>*/}
-                {/*                </div>*/}
-                {/*            </td>*/}
-                {/*        </tr>*/}
-                {/*    ))}*/}
-                {/*    </tbody>*/}
-                {/*</table>*/}
             </div>
         </div>
     );
