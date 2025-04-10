@@ -77,7 +77,7 @@ const DataChart = () => {
             period === 'years' ?
                 Array.from({ length: 5 }, (_, i) => `Năm ${value - 4 + i}`) :
                 period === 'month' ?
-                    Array.from({ length: revenueData.daily_revenue.length }, (_, i) => `Day ${i + 1}`) :
+                    Array.from({ length: revenueData.daily_revenue.length }, (_, i) => `Ngày ${i + 1}`) :
                     ['Total'];
 
         const revenueDataset = {

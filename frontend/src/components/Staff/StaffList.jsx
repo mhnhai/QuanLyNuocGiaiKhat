@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import StaffService from "../services/staff.service";
+import StaffService from "../../services/staff.service";
 import StaffForm from "./StaffForm";
 import Modal from "react-modal";
-import {Button, DeleteButton, EditButton} from "./Button";
-import SearchBar from "./SearchBar";
-import {FaEye} from "react-icons/fa";
+import SearchBar from "../SearchBar";
+import {FaEye, FaTrash} from "react-icons/fa";
 
 const StaffList = () => {
     const [staffs, setStaffs] = useState([]);
@@ -60,7 +59,8 @@ const StaffList = () => {
             return;
         }
         const filteredProducts = originalStaffs.filter(staff =>
-            staff.name.toLowerCase().includes(searchTerm.toLowerCase())
+            staff.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            staff.phone.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setStaffs(filteredProducts);
     };
@@ -77,10 +77,9 @@ const StaffList = () => {
 
     return (
         <div className="container pt-4">
-            <h1 className="text-2xl font-bold mb-4">Staff List</h1>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <Button onClick={() => toggleModal()} className="flex-initial">Thêm nhân viên</Button>
+                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm nhân viên</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
@@ -91,6 +90,7 @@ const StaffList = () => {
                     <StaffForm staff={selectedStaff} onSave={handleStaffSave} onClose={toggleModal}/>
                 </div>
             </Modal>
+            <h1 className="text-2xl font-bold mb-4">Danh sách nhân viên</h1>
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -101,6 +101,7 @@ const StaffList = () => {
                             <th className="py-2 px-4 border">Tên</th>
                             <th className="py-2 px-4 border">Vị trí công việc</th>
                             <th className="py-2 px-4 border">Lương</th>
+                            <th className="py-2 px-4 border">Số điện thoại</th>
                             <th className="py-2 px-4 border">Hành động</th>
                         </tr>
                         </thead>
@@ -109,15 +110,20 @@ const StaffList = () => {
                             <tr key={staff._id}>
                                 <td className="py-2 px-4 border">{staff.name}</td>
                                 <td className="py-2 px-4 border">{staff.position}</td>
-                                <td className="py-2 px-4 border">{staff.salary}</td>
+                                <td className="py-2 px-4 border">{staff.salary.toLocaleString()}</td>
+                                <td className="py-2 px-4 border">{staff.phone}</td>
                                 <td className="py-2 px-4 border">
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center gap-2">
                                         <button onClick={() => toggleModal(staff)}
                                                 className="btn btn-sm btn-outline btn-info">
                                             <FaEye/>
                                             Xem chi tiết
                                         </button>
-
+                                        <button onClick={() => handleDelete(staff._id)}
+                                                className="btn btn-sm btn-outline btn-error">
+                                            <FaTrash/>
+                                            Xóa
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

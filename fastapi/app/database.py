@@ -1,7 +1,4 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from bson import ObjectId
-from pydantic import BaseModel, Field
-from typing import Union
 
 MONGO_DETAILS = "mongodb://localhost:27017"
 

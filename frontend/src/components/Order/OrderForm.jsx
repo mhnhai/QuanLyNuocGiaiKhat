@@ -1,22 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import OrderService from "../services/order.service";
-import CustomerService from "../services/customer.service";
-import ProductService from "../services/product.service";
-import statusService from "../services/status.service";
-import payment_formService from "../services/payment_form.service";
-import formatDateTime from "../utils/formatDateTime";
-import { Button, DeleteButton } from "./Button";
+import OrderService from "../../services/order.service";
+import CustomerService from "../../services/customer.service";
+import ProductService from "../../services/product.service";
+import statusService from "../../services/status.service";
+import payment_formService from "../../services/payment_form.service";
+import formatDateTime from "../../utils/formatDateTime";
+import { Button, DeleteButton } from "../Button";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { IoMdAddCircleOutline, IoMdClose } from "react-icons/io";
 import Select from 'react-select';
-import staffService from '../services/staff.service';
+import staffService from '../../services/staff.service';
 
 const OrderForm = ({ order, onSave, onClose }) => {
     const user = JSON.parse(localStorage.getItem('user'));
     const [formData, setFormData] = useState(order || {
         id_customer: '',
         id_staff: user.id,
-        order_date: new Date().toISOString(),
+        order_date: new Date(),
         shipping_date: null,
         form_payment: '',
         total_price: '',
@@ -181,7 +181,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                         alert("Số lượng " + product.data.name + " không đủ, hãy giảm số lượng đặt hoặc đổi sản phẩm khác.");
                         return;
                     }
-                    if(formData.status === 'Đang giao'){
+                    if(formData.status === 'Đã giao'){
                         const updatedProduct = {
                             ...product.data,
                             stock: product.data.stock - parseInt(item.quantity, 10)
@@ -203,7 +203,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
             setFormData({
                 ...formData,
                 status: nextStatus,
-                shipping_date: currentIndex >= 0 ? new Date().toISOString() : formData.shipping_date
+                shipping_date: currentIndex >= 1 ? new Date().toISOString() : formData.shipping_date
             });
         }
     };
@@ -244,7 +244,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Nhân viên tạo đơn:</label>
+                    <label className="block text-sm font-medium text-gray-700">Nhân viên xác nhận:</label>
                     <input type="hidden" name="id_staff" value={formData.id_staff} />
                     <input type="text" value={staffName || ''} disabled
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
@@ -281,7 +281,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                 </div>
             </div>
             <div className="flex justify-between">
-                {formData.status !== "Đã hủy" && formData.status !== statuses[statuses.length - 1] && (
+                {formData.status !== "Đã hủy" && formData.status !== statuses[statuses.length - 2] && (
                     <Button type="button" onClick={handleNextStatus} className="bg-green-600 hover:bg-green-700">
                         {statuses[statuses.indexOf(formData.status) + 1] || "N/A"}
                     </Button>
@@ -332,7 +332,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                                        placeholder="Selling Price"/>
                             </td>
                             <td className="py-2 px-4 border">
-                                {product.quantity * product.selling_price}
+                                {(product.quantity * product.selling_price).toLocaleString()}
                             </td>
                             {!order && (
                                 <td className="py-2 px-4 border">

@@ -1,5 +1,7 @@
 function formatDateTime(dateTimeString) {
     const date = new Date(dateTimeString);
+    // Add 7 hours to the date
+    date.setHours(date.getHours() + 7);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
     const year = date.getFullYear();

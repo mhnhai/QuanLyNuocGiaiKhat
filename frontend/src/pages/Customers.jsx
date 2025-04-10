@@ -1,5 +1,5 @@
 import React from "react";
-import CustomerList from "../components/CustomerList";
+import CustomerList from "../components/Customer/CustomerList";
 const Customers = () => {
     return (
         <div>

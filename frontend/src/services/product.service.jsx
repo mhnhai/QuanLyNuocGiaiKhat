@@ -13,9 +13,19 @@ class ProductService {
         }
     }
 
-    async getAll() {
+    async getProductBySupplier(supplierId) {
         try {
-            const response = await axios.get(API_URL);
+            const response = await axios.get(`${API_URL}/supplier/${supplierId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching products by supplier:', error);
+            throw error;
+        }
+    }
+
+    async getAll(sort_by, order) {
+        try {
+            const response = await axios.get(API_URL, { params: { sort_by, order } });
             return response;
         } catch (error) {
             console.error('Error fetching products:', error);

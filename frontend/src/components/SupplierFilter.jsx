@@ -29,8 +29,8 @@ const SupplierFilter = ({ onFilter }) => {
             options={suppliers}
             onChange={handleChange}
             isClearable
-            placeholder="-- Chọn nhà cung cấp --"
-            className="w-64"
+            placeholder="-- Chọn --"
+            className="w-36"
         />
     );
 };

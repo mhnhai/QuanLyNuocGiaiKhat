@@ -16,9 +16,10 @@ const Dashboard = () => {
             <div className="md:col-span-1">
                 <OrderCount/>
             </div>
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
                 <DataChart/>
             </div>
+
         </div>
     );
 };

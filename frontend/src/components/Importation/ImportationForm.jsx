@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import ImportationService from "../services/importation.service";
-import ProductService from "../services/product.service";
-import SupplierService from "../services/supplier.service";
+import ImportationService from "../../services/importation.service";
+import ProductService from "../../services/product.service";
+import SupplierService from "../../services/supplier.service";
 import Select from 'react-select';
 import { FaDeleteLeft } from "react-icons/fa6";
-import { Button, DeleteButton, EditButton } from "./Button";
+import { Button, DeleteButton, EditButton } from "../Button";
 import {IoMdAddCircleOutline, IoMdClose} from "react-icons/io";
 
 const ImportationForm = ({ importation, onSave, onClose }) => {
@@ -18,6 +18,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
     });
     const [products, setProducts] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     useEffect(() => {
         if (importation) {
@@ -32,7 +33,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                 setProducts(response.data.map(product => ({
                     value: product._id,
                     label: product.name,
-                    import_price: product.import_price,
+                    import_price: product.supplier_price.find(sp => sp.id_supplier === formData.id_supplier)?.import_price || '',
                     stock: product.stock
                 })));
             } catch (error) {
@@ -55,6 +56,27 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
         fetchSuppliers();
     }, []);
 
+    useEffect(() => {
+        if (formData.id_supplier) {
+            const fetchProductsBySupplier = async () => {
+                try {
+                    const response = await ProductService.getProductBySupplier(formData.id_supplier);
+                    setFilteredProducts(response.map(product => ({
+                        value: product._id,
+                        label: product.name,
+                        import_price: product.supplier_price.find(sp => sp.id_supplier === formData.id_supplier)?.import_price || '',
+                        stock: product.stock
+                    })));
+                } catch (error) {
+                    console.error('Error fetching products by supplier:', error);
+                }
+            };
+            fetchProductsBySupplier();
+        } else {
+            setFilteredProducts([]);
+        }
+    }, [formData.id_supplier]);
+
     const calculateTotalPrice = (importItems) => {
         return importItems.reduce((total, item) => {
             return total + (item.import_price * item.quantity);
@@ -66,6 +88,14 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
         setFormData({
             ...formData,
             [name]: value
+        });
+    };
+
+    const handleSupplierChange = (selectedOption) => {
+        setFormData({
+            ...formData,
+            id_supplier: selectedOption ? selectedOption.value : '',
+            import_items: [{ id_product: '', quantity: '', import_price: '' }]
         });
     };
 
@@ -86,6 +116,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
             import_items: updatedProducts,
             total_price: totalPrice
         });
+        console.log(formData);
     };
 
     const handleQuantityChange = (index, e) => {
@@ -127,18 +158,39 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                 return;
             }
 
+            // Validate all required fields
+            if (!formData.id_supplier) {
+                alert("Vui lòng chọn nhà cung cấp");
+                return;
+            }
+
+            // Validate import items
+            for (const item of formData.import_items) {
+                if (!item.id_product || !item.quantity || !item.import_price) {
+                    alert("Vui lòng điền đầy đủ thông tin sản phẩm");
+                    return;
+                }
+                if (parseInt(item.quantity) <= 0) {
+                    alert("Số lượng phải lớn hơn 0");
+                    return;
+                }
+            }
+
             const updatedImportItems = formData.import_items.map(item => {
-                const product = products.find(p => p.value === item.id_product);
+                const product = filteredProducts.find(p => p.value === item.id_product);
                 return {
                     ...item,
-                    import_price: product ? product.import_price : item.import_price
+                    import_price: product ? product.import_price : item.import_price,
+                    quantity: parseInt(item.quantity, 10)
                 };
             });
 
             const updatedFormData = {
                 ...formData,
-                import_items: updatedImportItems
+                import_items: updatedImportItems,
+                total_price: calculateTotalPrice(updatedImportItems)
             };
+
             let response;
             if (importation) {
                 response = await ImportationService.update(importation._id, updatedFormData);
@@ -146,19 +198,25 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                 response = await ImportationService.create(updatedFormData);
             }
 
+            // Update product stock
             for (const item of updatedImportItems) {
-                const product = await ProductService.getById(item.id_product);
-                if (product) {
-                    const updatedProduct = {
-                        ...product.data,
-                        stock: product.data.stock + parseInt(item.quantity, 10)
-                    };
-                    await ProductService.update(product.data._id, updatedProduct);
+                try {
+                    const product = await ProductService.getById(item.id_product);
+                    if (product) {
+                        const updatedProduct = {
+                            ...product.data,
+                            stock: product.data.stock + item.quantity
+                        };
+                        await ProductService.update(product.data._id, updatedProduct);
+                    }
+                } catch (error) {
+                    console.error(`Error updating stock for product ${item.id_product}:`, error);
                 }
             }
             onSave(response.data);
         } catch (error) {
             console.error('Error saving importation:', error);
+            alert("Có lỗi xảy ra khi lưu đơn nhập hàng");
         }
     };
 
@@ -174,10 +232,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                     <label className="block text-sm font-medium text-gray-700">Nhà cung cấp:</label>
                     <Select
                         value={suppliers.find(option => option.value === formData.id_supplier)}
-                        onChange={(selectedOption) => setFormData({
-                            ...formData,
-                            id_supplier: selectedOption ? selectedOption.value : ''
-                        })}
+                        onChange={handleSupplierChange}
                         options={suppliers}
                         isDisabled={!!importation}
                         className="mt-1 block w-full"
@@ -220,7 +275,7 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                     <tr>
                         <th className="py-2 px-4 border">Sản phẩm</th>
                         <th className="py-2 px-4 border">Số lượng</th>
-                        <th className="py-2 px-4 border">Giá bán</th>
+                        <th className="py-2 px-4 border">Giá nhập</th>
                         <th className="py-2 px-4 border">Thành tiền</th>
                         {!importation && <th className="py-2 px-4 border">Hành động</th>}
                     </tr>
@@ -230,10 +285,10 @@ const ImportationForm = ({ importation, onSave, onClose }) => {
                         <tr key={index}>
                             <td className="py-2 px-4 border">
                                 <Select
-                                    value={products.find(option => option.value === product.id_product)}
+                                    value={filteredProducts.find(option => option.value === product.id_product)}
                                     onChange={(selectedOption) => handleProductChange(index, selectedOption)}
-                                    options={products}
-                                    isDisabled={!!importation}
+                                    options={filteredProducts}
+                                    isDisabled={!!importation || !formData.id_supplier}
                                     className="mt-1 block w-full"
                                     placeholder="--Sản phẩm--"
                                 />

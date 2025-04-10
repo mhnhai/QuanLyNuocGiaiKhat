@@ -1,18 +1,18 @@
 from pydantic import BaseModel, Field
-from typing import Union
+from typing import Union, List, Optional
 from bson import ObjectId
+from .supplierprice import SupplierPrice
 
 class ProductModel(BaseModel):
     id: str = Field(alias="_id", default=None)
-    id_supplier: str
-    name: str
-    import_price: float # gia nhap
+    name: str = Field(..., min_length=2, max_length=100)
+    supplier_price: List[SupplierPrice] # gia nhap tu cac nha cung cap    
     selling_price: float # gia ban
-    category: str
+    category: str = Field(..., min_length=2, max_length=20)
     stock: int
-    volume: Union[str, None] = None
-    origin: Union[str, None] = None
-    description: Union[str, None] = None
+    volume: str = Field(..., min_length=2, max_length=10)
+    origin: str = Field(..., min_length=2, max_length=30)
+    description: str = Field(..., min_length=10, max_length=1000)
     image: Union[str, None] = None
 
     class Config:

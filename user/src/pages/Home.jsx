@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
 import Banner from '../components/Banner';
 import ProductCard from '../components/ProductCard';
-import Footer from '../components/Footer';
 import ProductService from "../services/product.service";
 import { FaArrowRight } from 'react-icons/fa';
 
@@ -19,7 +18,7 @@ const Home = () => {
             setLoading(true);
             const response = await ProductService.getAll();
             // Get only the first 16 products
-            setProducts(response.data.slice(0, 15));
+            setProducts(response.data.slice(0, 12));
         } catch (e) {
             console.error(e);
         } finally {
@@ -53,7 +52,6 @@ const Home = () => {
                     ))}
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

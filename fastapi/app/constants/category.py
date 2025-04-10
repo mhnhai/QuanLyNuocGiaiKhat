@@ -4,4 +4,4 @@ categories = [
     'Nước tinh khiết',
     'Bia, rượu',
     'Nước trà, nước ép'
-];
+]

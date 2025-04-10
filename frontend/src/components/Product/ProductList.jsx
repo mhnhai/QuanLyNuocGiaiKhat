@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import ProductService from "../services/product.service";
+import ProductService from "../../services/product.service";
 import ProductForm from "./ProductForm";
 import Modal from "react-modal";
-import SearchBar from "./SearchBar";
-import SupplierFilter from "./SupplierFilter";
+import SearchBar from "../SearchBar";
+import SupplierFilter from "../SupplierFilter";
 import { FaEye, FaTrash } from "react-icons/fa";
 
 const ProductList = () => {
@@ -12,22 +12,31 @@ const ProductList = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [originalProducts, setOriginalProducts] = useState([]);
+    const [sortConfig, setSortConfig] = useState({ sort_by: "name", order: 1 });
     const user = JSON.parse(localStorage.getItem('user'));
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [sortConfig]);
 
     const fetchProducts = async () => {
         try {
-            const response = await ProductService.getAll();
+            const response = await ProductService.getAll(sortConfig.sort_by, sortConfig.order);
             setProducts(response.data);
-            setOriginalProducts(response.data); // Lưu danh sách gốc để không bị mất khi tìm kiếm
+            setOriginalProducts(response.data);
             setLoading(false);
         } catch (e) {
             console.error(e);
             setLoading(false);
         }
+    };
+
+    const handleSortChange = (e) => {
+        const value = e.target.value;
+        const lastUnderscoreIndex = value.lastIndexOf('_');
+        const sort_by = value.substring(0, lastUnderscoreIndex);
+        const order = parseInt(value.substring(lastUnderscoreIndex + 1));
+        setSortConfig({ sort_by, order });
     };
 
     const handleDelete = async (id) => {
@@ -72,14 +81,12 @@ const ProductList = () => {
         setProducts(filteredProducts);
     };
 
-    const handleFilter = (supplierId) => {
+    const handleFilter = async (supplierId) => {
         if (!supplierId) {
-            setProducts(originalProducts); //
-            // Nếu bỏ chọn filter, hiển thị lại danh sách gốc
+            setProducts(originalProducts); 
             return;
         }
-
-        const filteredProducts = originalProducts.filter(product => product.id_supplier === supplierId);
+        const filteredProducts = await ProductService.getProductBySupplier(supplierId);
         setProducts(filteredProducts);
     };
 
@@ -98,8 +105,23 @@ const ProductList = () => {
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
                 <div className="flex items-center space-x-2 bg-base-100 p-3 rounded-lg shadow-lg">
-                    <span>Lọc theo nhà phân phối:</span>
+                    <span>Lọc theo nhà cung cấp:</span>
                     <SupplierFilter onFilter={handleFilter}/>
+                </div>
+                <div className="flex items-center space-x-2 bg-base-100 p-4 rounded-lg shadow-lg">
+                    <span>Sắp xếp theo:</span>
+                    <select 
+                        value={`${sortConfig.sort_by}_${sortConfig.order}`}
+                        onChange={handleSortChange}
+                        className="select select-primary select-bordered select-sm w-44"
+                    >
+                        <option value="name_1">Tên A-Z</option>
+                        <option value="name_-1">Tên Z-A</option>
+                        <option value="selling_price_1">Giá tăng dần</option>
+                        <option value="selling_price_-1">Giá giảm dần</option>
+                        <option value="stock_1">Tồn kho tăng dần</option>
+                        <option value="stock_-1">Tồn kho giảm dần</option>
+                    </select>
                 </div>
                 <button disabled={user.role === "staff"} onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm sản phẩm</button>
             </div>
@@ -120,7 +142,6 @@ const ProductList = () => {
                         <tr>
                             <th className="py-2 px-4 border w-2/12">Tên sản phẩm</th>
                             <th className="py-2 px-4 border w-1/12">Loại</th>
-                            <th className="py-2 px-4 border w-1/12">Giá nhập</th>
                             <th className="py-2 px-4 border w-1/12">Giá bán</th>
                             <th className="py-2 px-4 border w-1/12">Tồn kho</th>
                             <th className="py-2 px-4 border w-1/6">Hành động</th>
@@ -131,7 +152,6 @@ const ProductList = () => {
                             <tr key={product._id}>
                                 <td className="py-2 px-4 border">{product.name}</td>
                                 <td className="py-2 px-4 border">{product.category}</td>
-                                <td className="py-2 px-4 border">{product.import_price}</td>
                                 <td className="py-2 px-4 border">{product.selling_price}</td>
                                 <td className="py-2 px-4 border">{product.stock}</td>
                                 <td className="py-2 px-4 border">

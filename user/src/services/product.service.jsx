@@ -23,9 +23,9 @@ class ProductService {
         }
     }
 
-    async getAll() {
+    async getAll(sort_by, order) {
         try {
-            const response = await axios.get(API_URL);
+            const response = await axios.get(API_URL, { params: { sort_by, order } });
             return response;
         } catch (error) {
             console.error('Error fetching products:', error);

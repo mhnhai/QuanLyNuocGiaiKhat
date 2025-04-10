@@ -1,5 +1,5 @@
 import React from "react";
-import ImportationList from "../components/ImportationList";
+import ImportationList from "../components/Importation/ImportationList";
 const Importation = () => {
     return (
         <div>

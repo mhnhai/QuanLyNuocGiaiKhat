@@ -80,7 +80,7 @@ const Profile = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     disabled
-                    className="w-full p-2 border bg-base-100 border-gray-300 rounded"
+                    className="w-full p-2 border bg-base-200 border-gray-300 rounded"
                 />
                 {formik.touched.username && formik.errors.username ? (
                     <p className="text-red-500 text-xs mt-1">{formik.errors.username}</p>

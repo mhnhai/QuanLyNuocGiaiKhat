@@ -4,7 +4,8 @@ from app.database import orders_collection
 from app.models.order import OrderModel
 from bson import ObjectId
 import logging
-
+import datetime
+from datetime import datetime, timedelta
 router = APIRouter()
 
 # Configure logging
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 async def get_orders_by_customer(id_customer: str):
     try:
         orders = []
-        async for order in orders_collection.find({"id_customer": id_customer}):
+        async for order in orders_collection.find({"id_customer": id_customer}).sort("order_date", -1):
             order["_id"] = str(order["_id"])  # Convert ObjectId to string
             orders.append(OrderModel(**order))
         return orders
@@ -23,9 +24,27 @@ async def get_orders_by_customer(id_customer: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/orders/count", response_model=dict,  tags=["Orders"])
-async def count_orders():
+async def count_orders(year: int, month: int = None, day: int = None):
     try:
-        count = await orders_collection.count_documents({})
+        # Xác định khoảng thời gian bắt đầu và kết thúc
+        if day is not None and month is not None:
+            start_date = datetime(year, month, day)
+            end_date = start_date + timedelta(days=1)
+        elif month is not None:
+            start_date = datetime(year, month, 1)
+            if month == 12:
+                end_date = datetime(year + 1, 1, 1)
+            else:
+                end_date = datetime(year, month + 1, 1)
+        else:
+            start_date = datetime(year, 1, 1)
+            end_date = datetime(year + 1, 1, 1)
+
+        # Thực hiện truy vấn đếm số lượng đơn hàng
+        count = await orders_collection.count_documents({
+            "order_date": {"$gte": start_date, "$lt": end_date}
+        })
+
         return {"total_orders": count}
     except Exception as e:
         logger.error(f"Error counting orders: {e}")
@@ -36,7 +55,7 @@ async def count_orders():
 async def read_orders():
     try:
         orders = []
-        async for order in orders_collection.find():
+        async for order in orders_collection.find().sort("order_date", -1):
             order["_id"] = str(order["_id"])  # Convert ObjectId to string
             orders.append(OrderModel(**order))
         return orders

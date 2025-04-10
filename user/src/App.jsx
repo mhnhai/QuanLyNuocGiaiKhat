@@ -17,7 +17,7 @@ import EnergyDrinks from './pages/categories/EnergyDrinks';
 import PureWater from './pages/categories/PureWater';
 import Alcohol from './pages/categories/Alcohol';
 import TeaAndJuice from './pages/categories/TeaAndJuice';
-
+import Footer from './components/Footer';
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('user'));
 
@@ -53,6 +53,7 @@ const App = () => {
                         <Route path="/category/tea-and-juice" element={<TeaAndJuice />} />
                     </Routes>
                 </div>
+                <Footer />
             </div>
         </Router>
     );

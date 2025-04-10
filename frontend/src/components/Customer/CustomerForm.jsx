@@ -1,97 +1,54 @@
 import React, { useState, useEffect } from "react";
-import Select from 'react-select';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import StaffService from "../services/staff.service";
-import PositionService from "../services/position.service";
-import RoleService from "../services/role.service";
-import {Button} from "./Button";
+import CustomerService from "../../services/customer.service";
+import {Button} from "../Button";
 import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
     name: yup.string().required('Hãy nhập tên'),
     username: yup.string().required('Hãy nhập tên tài khoản'),
     password: yup.string().required('Hãy nhập mật khẩu'),
-    position: yup.string().required('Hãy chọn vị trí công việc'),
-    salary: yup.number().required('Salary is required').positive('Salary must be a positive number'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
-    role_account: yup.string().required('Hãy chọn vai trò cho tài khoản'),
     address: yup.string().required('Hãy nhập địa chỉ'),
 });
 
-const StaffForm = ({ staff, onSave, onClose }) => {
+const CustomerForm = ({ customer, onSave, onClose }) => {
     const formik = useFormik({
         initialValues: {
             name: '',
             username: '',
             password: '',
-            position: '',
-            salary: '',
             phone: '',
-            role_account: '',
             address: '',
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
                 let response;
-                if (staff) {
-                    response = await StaffService.update(staff._id, values);
+                if (customer) {
+                    response = await CustomerService.update(customer._id, values);
                 } else {
-                    response = await StaffService.create(values);
+                    const isRegistered = await CustomerService.checkRegistered(values.username);
+                    if (isRegistered) {
+                        alert('Tên tài khoản đã tồn tại');
+                        return;
+                    }
+                    response = await CustomerService.create(values);
                 }
                 onSave(response.data);
             } catch (error) {
-                console.error('Error saving staff:', error);
+                console.error('Error saving customer:', error);
             }
         },
     });
 
-    const [positions, setPositions] = useState([]);
-    const [roles, setRoles] = useState([]);
 
     useEffect(() => {
-        if (staff) {
-            formik.setValues(staff);
+        if (customer) {
+            formik.setValues(customer);
         }
-    }, [staff]);
-
-    useEffect(() => {
-        const fetchPositions = async () => {
-            try {
-                const response = await PositionService.getPositions();
-                setPositions(response.map(position => ({
-                    value: position,
-                    label: position
-                })));
-            } catch (error) {
-                console.error('Error fetching positions:', error);
-            }
-        };
-
-        const fetchRoles = async () => {
-            try {
-                const response = await RoleService.getRoles();
-                setRoles(response.map(role => ({
-                    value: role.key,
-                    label: role.name
-                })));
-            } catch (error) {
-                console.error('Error fetching roles:', error);
-            }
-        };
-
-        fetchPositions();
-        fetchRoles();
-    }, []);
-
-    const handlePositionChange = (selectedOption) => {
-        formik.setFieldValue('position', selectedOption ? selectedOption.value : '');
-    };
-
-    const handleRoleChange = (selectedOption) => {
-        formik.setFieldValue('role_account', selectedOption ? selectedOption.value : '');
-    };
+    }, [customer]);
 
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -102,7 +59,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
             </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Name:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tên khách hàng:</label>
                     <input
                         type="text"
                         name="name"
@@ -116,7 +73,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Username:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tên tài khoản:</label>
                     <input
                         type="text"
                         name="username"
@@ -130,7 +87,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Password:</label>
+                    <label className="block text-sm font-medium text-gray-700">Mật khẩu:</label>
                     <input
                         type="password"
                         name="password"
@@ -144,35 +101,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Position:</label>
-                    <Select
-                        value={positions.find(option => option.value === formik.values.position)}
-                        onChange={handlePositionChange}
-                        options={positions}
-                        className="mt-1 block w-full"
-                        placeholder="-- Select Position --"
-                    />
-                    {formik.touched.position && formik.errors.position ? (
-                        <p className="text-red-500 text-xs mt-1">{formik.errors.position}</p>
-                    ) : null}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Salary:</label>
-                    <input
-                        type="text"
-                        name="salary"
-                        value={formik.values.salary}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
-                    {formik.touched.salary && formik.errors.salary ? (
-                        <p className="text-red-500 text-xs mt-1">{formik.errors.salary}</p>
-                    ) : null}
-                </div>
-               
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                    <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
                     <input
                         type="text"
                         name="phone"
@@ -186,20 +115,7 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Role Account:</label>
-                    <Select
-                        value={roles.find(option => option.value === formik.values.role_account)}
-                        onChange={handleRoleChange}
-                        options={roles}
-                        className="mt-1 block w-full"
-                        placeholder="-- Select Role --"
-                    />
-                    {formik.touched.role_account && formik.errors.role_account ? (
-                        <p className="text-red-500 text-xs mt-1">{formik.errors.role_account}</p>
-                    ) : null}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Address:</label>
+                    <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
                     <input
                         type="text"
                         name="address"
@@ -214,10 +130,10 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                 </div>
             </div>
             <div className="flex justify-end space-x-2">
-                <button className="btn btn-neutral">Lưu</button>
+                <button type="submit" className="btn btn-neutral">Lưu</button>
             </div>
         </form>
     );
 };
 
-export default StaffForm;
+export default CustomerForm;

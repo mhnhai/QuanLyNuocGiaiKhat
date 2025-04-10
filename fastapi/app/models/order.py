@@ -10,9 +10,9 @@ class OrderModel(BaseModel):
     id_staff: str
     order_date: datetime
     shipping_date: Optional[datetime] = None
-    form_payment: str
+    form_payment: str = Field(..., min_length=5, max_length=50)
     total_price: float
-    status: str
+    status: str = Field(..., min_length=5, max_length=50)
     order_items: List[OrderItem]
 
     class Config:

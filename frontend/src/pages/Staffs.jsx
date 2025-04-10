@@ -1,5 +1,5 @@
 import React from "react";
-import StaffList from "../components/StaffList";
+import StaffList from "../components/Staff/StaffList";
 const Staffs = () => {
     return (
         <div>

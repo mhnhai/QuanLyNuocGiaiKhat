@@ -18,9 +18,11 @@ const CustomerCount = () => {
     }, []);
 
     return (
-        <div className="card bg-base-100 w-96 shadow-lg p-4">
-            <h2 className="text-xl font-bold">Số lượng khách hàng</h2>
-            <p className="text-2xl">{customerCount}</p>
+        <div className="card bg-base-100 shadow-lg p-6 h-full">
+            <div className="flex flex-col justify-between h-full">
+                <h2 className="text-xl font-bold text-gray-800">Số lượng khách hàng</h2>
+                <p className="text-4xl font-bold text-primary">{customerCount}</p>
+            </div>
         </div>
     );
 };

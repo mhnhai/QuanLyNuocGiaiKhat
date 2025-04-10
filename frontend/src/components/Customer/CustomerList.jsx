@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import CustomerService from '../services/customer.service';
+import CustomerService from '../../services/customer.service';
 import CustomerForm from './CustomerForm';
 import Modal from "react-modal";
-import { Button, DeleteButton, EditButton } from "./Button";
-import SearchBar from "./SearchBar";
+import SearchBar from "../SearchBar";
 import {FaEye, FaTrash} from "react-icons/fa";
 
 const CustomerList = () => {
@@ -57,7 +56,7 @@ const CustomerList = () => {
     const modalStyles = {
         content: {
             width: '50%',
-            height: '35%',
+            height: '55%',
             margin: 'auto',
             padding: '20px',
         },
@@ -69,7 +68,8 @@ const CustomerList = () => {
             return;
         }
         const filteredProducts = originalCustomers.filter(customer =>
-            customer.fullname.toLowerCase().includes(searchTerm.toLowerCase())
+            customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.phone.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setCustomers(filteredProducts);
     };
@@ -78,7 +78,7 @@ const CustomerList = () => {
         <div className="container pt-4">
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Tạo khách hàng</button>
+                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm khách hàng</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}

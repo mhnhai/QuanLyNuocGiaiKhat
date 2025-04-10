@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import SupplierService from "../services/supplier.service";
+import SupplierService from "../../services/supplier.service";
 import SupplierForm from "./SupplierForm";
 import Modal from "react-modal";
-import {Button, DeleteButton, EditButton} from "./Button";
-import SearchBar from "./SearchBar";
-import {FaEye} from "react-icons/fa";
+import SearchBar from "../SearchBar";
+import {FaEye, FaTrash} from "react-icons/fa";
 
 const SupplierList = () => {
     const [suppliers, setSuppliers] = useState([]);
@@ -60,7 +59,8 @@ const SupplierList = () => {
             return;
         }
         const filteredProducts = originalSuppliers.filter(supplier =>
-            supplier.name.toLowerCase().includes(searchTerm.toLowerCase())
+            supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            supplier.phone.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setSuppliers(filteredProducts);
     };
@@ -75,10 +75,9 @@ const SupplierList = () => {
     };
     return (
         <div className="container pt-4">
-            <h1 className="text-2xl font-bold mb-4">Supplier List</h1>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
-                <Button onClick={() => toggleModal()} className="flex-initial">Thêm nhà cung cấp</Button>
+                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Thêm nhà cung cấp</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
@@ -89,6 +88,7 @@ const SupplierList = () => {
                     <SupplierForm supplier={selectedSupplier} onSave={handleSupplierSave} onClose={toggleModal}/>
                 </div>
             </Modal>
+            <h1 className="text-2xl font-bold mb-4">Danh sách nhà cung cấp</h1>
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -96,9 +96,9 @@ const SupplierList = () => {
                     <table className="table bg-white">
                         <thead>
                         <tr>
-                            <th className="py-2 px-4 border">Name</th>
-                            <th className="py-2 px-4 border">Phone</th>
-                            <th className="py-2 px-4 border">Action</th>
+                            <th className="py-2 px-4 border">Tên nhà cung cấp</th>
+                            <th className="py-2 px-4 border">Số điện thoại</th>
+                            <th className="py-2 px-4 border">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -107,11 +107,16 @@ const SupplierList = () => {
                                 <td className="py-2 px-4 border">{supplier.name}</td>
                                 <td className="py-2 px-4 border">{supplier.phone}</td>
                                 <td className="py-2 px-4 border">
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center gap-2">
                                         <button onClick={() => toggleModal(supplier)}
                                                 className="btn btn-sm btn-outline btn-info">
                                             <FaEye/>
                                             Xem chi tiết
+                                        </button>
+                                        <button onClick={() => handleDelete(supplier._id)}
+                                                className="btn btn-sm btn-outline btn-error">
+                                            <FaTrash/>
+                                            Xóa
                                         </button>
                                     </div>
                                 </td>

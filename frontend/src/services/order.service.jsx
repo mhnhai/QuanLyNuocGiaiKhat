@@ -3,12 +3,16 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8000/api/orders';
 
 class OrderService {
-    async getOrderCount(){
+    async getOrderCount(year, month, day){
         try {
-            const response = await axios.get(`${API_URL}/count`);
-            return response.data;
+            let params = {};
+            if (year) params.year = year;   
+            if (month) params.month = month;
+            if (day) params.day = day;
+            const response = await axios.get(`${API_URL}/count`, { params });
+            return response;
         } catch (error) {
-            console.error('Error fetching product count:', error);
+            console.error('Error fetching order count:', error);
             throw error;
         }
     }

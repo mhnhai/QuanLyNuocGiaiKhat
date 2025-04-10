@@ -4,12 +4,12 @@ from bson import ObjectId
 
 class CustomerModel(BaseModel):
     id: str = Field(alias="_id", default=None)
-    name: str
-    username: str 
-    password: str
+    name: str = Field(..., min_length=2, max_length=50)
+    username: str = Field(..., min_length=5, max_length=20)
+    password: str = Field(..., min_length=6, max_length=20)
     phone: str = Field(..., min_length=10, max_length=10)
-    role_account: str 
-    address: str
+    address: str = Field(..., min_length=1, max_length=50)
+    role_account: str = Field(default="customer")
     
     class Config:
         allow_population_by_field_name = True

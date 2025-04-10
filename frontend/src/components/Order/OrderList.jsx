@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import OrderService from "../services/order.service";
-import CustomerService from "../services/customer.service";
+import OrderService from "../../services/order.service";
+import CustomerService from "../../services/customer.service";
 import OrderForm from "./OrderForm";
 import Modal from "react-modal";
-import formatDateTime from "../utils/formatDateTime";
-import { Button, DeleteButton, EditButton } from "./Button";
-import SearchBar from "./SearchBar";
-import DateFilter from "./DateFilter";
+import formatDateTime from "../../utils/formatDateTime";
+import SearchBar from "../SearchBar";
+import DateFilter from "../DateFilter";
 import {FaEye, FaTrash} from "react-icons/fa";
 
 const OrderList = () => {
@@ -78,14 +77,14 @@ const OrderList = () => {
     };
 
     const handleSearch = (searchTerm) => {
-        if (searchTerm) {
-            const filteredOrders = orders.filter(order =>
-                customerNames[order.id_customer]?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setOrders(filteredOrders);
-        } else {
-            fetchOrders();
+        if (!searchTerm) {
+            setOrders(originalOrders);
+            return;
         }
+        const filteredOrders = originalOrders.filter(order =>
+            customerNames[order.id_customer]?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setOrders(filteredOrders);
     };
 
     const handleDateFilter = (date) => {
@@ -110,14 +109,13 @@ const OrderList = () => {
 
     return (
         <div className="container pt-4">
-            <h1 className="text-2xl font-bold mb-4">Order List</h1>
             <div className="flex justify-between items-center mb-4">
                 <SearchBar onSearch={handleSearch} className="flex-1"/>
                 <div className="flex shadow-lg items-center space-x-2 bg-base-100 p-3 rounded-lg">
                     <span>Lọc theo ngày:</span>
                     <DateFilter onFilter={handleDateFilter}/>
                 </div>
-                <Button onClick={() => toggleModal()} className="flex-initial">Tạo đơn hàng</Button>
+                <button onClick={() => toggleModal()} className="btn btn-neutral flex-initial">Tạo đơn hàng</button>
             </div>
             <Modal
                 isOpen={modalIsOpen}
@@ -128,6 +126,7 @@ const OrderList = () => {
                     <OrderForm order={selectedOrder} onSave={handleOrderSave} onClose={toggleModal}/>
                 </div>
             </Modal>
+            <h1 className="text-2xl font-bold mb-4">Danh sách đơn hàng</h1>
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -141,7 +140,7 @@ const OrderList = () => {
                                 <th className="py-2 px-4 border">Ngày giao hàng</th>
                                 <th className="py-2 px-4 border">Tổng giá trị</th>
                                 <th className="py-2 px-4 border">Trạng thái</th>
-                                <th className="py-2 px-4 border">Action</th>
+                                <th className="py-2 px-4 border">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -150,20 +149,23 @@ const OrderList = () => {
                                     <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>
                                     <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>
                                     <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
-                                    <td className="py-2 px-4 border">{order.total_price}</td>
+                                    <td className="py-2 px-4 border">{order.total_price.toLocaleString()}</td>
                                     <td className="py-2 px-4 border">{order.status}</td>
                                     <td className="py-2 px-4 border">
-                                        <div className="flex justify-center">
+                                        <div className="flex justify-center gap-2">
                                             <button onClick={() => toggleModal(order)}
                                                     className="btn btn-sm btn-outline btn-info">
                                                 <FaEye/>
                                                 Xem chi tiết
                                             </button>
-                                            <button onClick={() => handleDelete(order._id)}
-                                                    className="btn btn-sm btn-outline btn-error">
-                                                <FaTrash/>
-                                                Xóa
-                                            </button>
+                                            {/* chỉ có nút xóa đơn hàng khi đơn hàng ở trạng thái chưa xác nhận, đã xác nhận, đã hủy */}
+                                            {(order.status === "Chưa xác nhận" || order.status === "Đã xác nhận" || order.status === "Đã hủy") && (
+                                                <button onClick={() => handleDelete(order._id)}
+                                                        className="btn btn-sm btn-outline btn-error">
+                                                    <FaTrash/>
+                                                    Xóa
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

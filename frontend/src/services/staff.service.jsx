@@ -13,6 +13,16 @@ class StaffService {
         }
     }
 
+    async checkRegistered(username) {
+        try {
+            const response = await axios.get(`${API_URL}/check-registered?username=${username}`);
+            return response.data.registered;
+        } catch (error) {
+            console.error('Error checking if staff is registered:', error);  
+            throw error;
+        }
+    }
+
     async getStaffName(staffId){
         try {
             const response = await axios.get(`${API_URL}/${staffId}/name`);

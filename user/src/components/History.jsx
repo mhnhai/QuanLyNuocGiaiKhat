@@ -1,96 +1,186 @@
 import React, { useEffect, useState } from 'react';
 import OrderService from "../services/order.service";
 import productService from '../services/product.service';
+import { FaTrash } from "react-icons/fa";
+import formatDateTime from '../utils/formatDateTime';
 
 const History = () => {
     const [orders, setOrders] = useState([]);
     const [productNames, setProductNames] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [dateFilter, setDateFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
     const currentUser = JSON.parse(localStorage.getItem('user'));
 
+    const statusOptions = [
+        { value: 'all', label: 'Tất cả' },
+        { value: 'Chưa xác nhận', label: 'Chưa xác nhận' },
+        { value: 'Đã xác nhận', label: 'Đã xác nhận' },
+        { value: 'Đang giao', label: 'Đang giao' },
+        { value: 'Đã giao', label: 'Đã giao' },
+        { value: 'Đã hủy', label: 'Đã hủy' }
+    ];
+
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await OrderService.getOrderByCustomer(currentUser.id);
-                setOrders(response.data);
-
-                // Fetch product names
-                const productIds = response.data.flatMap(order => order.order_items.map(item => item.id_product));
-                const uniqueProductIds = [...new Set(productIds)];
-                const productNamesMap = {};
-
-                for (const id of uniqueProductIds) {
-                    const productResponse = await productService.getProductName(id);
-                    productNamesMap[id] = productResponse.data.name;
-                }
-
-                setProductNames(productNamesMap);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchOrders();
     }, [currentUser.id]);
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-        </div>
-    );
-    
-    if (error) return (
-        <div className="alert alert-error">
-            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Error loading orders: {error.message}</span>
-        </div>
-    );
+    const fetchOrders = async () => {
+        try {
+            const response = await OrderService.getOrderByCustomer(currentUser.id);
+            setOrders(response.data);
+
+            // Fetch product names
+            const productIds = response.data.flatMap(order => order.order_items.map(item => item.id_product));
+            const uniqueProductIds = [...new Set(productIds)];
+            const productNamesMap = {};
+
+            for (const id of uniqueProductIds) {
+                const productResponse = await productService.getProductName(id);
+                productNamesMap[id] = productResponse.data.name;
+            }
+
+            setProductNames(productNamesMap);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelOrder = async (orderId) => {
+        if (window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+            try {
+                await OrderService.updateOrderStatus(orderId, 'Đã hủy');
+                setOrders(orders.map(order =>
+                    order._id === orderId
+                        ? { ...order, status: 'Đã hủy' }
+                        : order
+                ));
+            } catch (error) {
+                console.error('Error canceling order:', error);
+                alert('Không thể hủy đơn hàng');
+            }
+        }
+    };
+
+    const filteredOrders = orders.filter(order => {
+        const orderDate = new Date(order.order_date);
+        const localDate = new Date(orderDate.getTime() - orderDate.getTimezoneOffset() * 60000)
+            .toISOString()
+            .split('T')[0];
+
+        const matchesDate = !dateFilter || localDate === dateFilter;
+        const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+        return matchesDate && matchesStatus;
+    });
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="alert alert-error">
+                    <span>Đã xảy ra lỗi khi tải lịch sử đơn hàng.</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="container mx-auto p-4 min-h-screen">
-            <h1 className="text-4xl font-bold mb-8 text-center">Lịch sử đơn hàng</h1>
-            {orders.length === 0 ? (
-                <div className="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>No orders found for this customer.</span>
+        <div className="container mx-auto my-10 px-4">
+            <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold">Lịch sử đơn hàng</h2>
+                <div className="text-sm breadcrumbs justify-center">
+                    <ul>
+                        <li>Trang chủ</li>
+                        <li>Lịch sử đơn hàng</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="flex gap-4 mb-6">
+                <div className="flex-1">
+                    <input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        className="input input-bordered w-full"
+                    />
+                </div>
+                <div className="w-64">
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="select select-bordered w-full"
+                    >
+                        {statusOptions.map(option => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {filteredOrders.length === 0 ? (
+                <div className="text-center py-8">
+                    <div className="alert alert-info">
+                        <span>Không tìm thấy đơn hàng nào.</span>
+                    </div>
                 </div>
             ) : (
                 <div className="space-y-6">
-                    {orders.map(order => (
+                    {filteredOrders.map(order => (
                         <div key={order._id} className="card bg-base-100 shadow-xl">
                             <div className="card-body">
-                                <div className="flex justify-between items-center">
-                                    <h2 className="card-title">Đơn hàng #{order._id}</h2>
-                                    <div className={`badge ${
-                                        order.status === 'Đã giao' ? 'badge-success' :
-                                        order.status === 'Đang giao' ? 'badge-warning' :
-                                        'badge-info'
-                                    } badge-lg`}>
-                                        {order.status}
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="card-title">Đơn hàng #{order._id.slice(-6)}</h3>
+                                        <p className="text-sm opacity-75">
+                                            Ngày đặt: {formatDateTime(order.order_date)}
+                                        </p>
+                                        {order.shipping_date && (
+                                            <p className="text-sm opacity-75">
+                                                Ngày giao: {formatDateTime(order.shipping_date)}
+                                            </p>
+                                        )}
+                                        {!order.shipping_date && (
+                                            <p className="text-sm opacity-75">
+                                                Ngày nhận: Chưa giao hàng
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className={`badge ${order.status === 'Đã xác nhận' ? 'badge-success' :
+                                            order.status === 'Đang giao' ? 'badge-warning' :
+                                                order.status === 'Đã giao' ? 'badge-info' :
+                                                    order.status === 'Đã hủy' ? 'badge-error' :
+                                                        'badge-ghost'
+                                            }`}>
+                                            {order.status}
+                                        </div>
+                                        {order.status === 'Chưa xác nhận' && (
+                                            <button
+                                                className="btn btn-error btn-sm"
+                                                onClick={() => handleCancelOrder(order._id)}
+                                            >
+                                                <FaTrash className="mr-2" />
+                                                Hủy đơn
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="divider"></div>
-                                <div className="grid grid-cols-3 gap-4 text-sm mb-4">
-                                    <div>
-                                        <p className="font-semibold">Ngày đặt</p>
-                                        <p>{new Date(order.order_date).toLocaleDateString()}</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">Ngày giao</p>
-                                        <p>{new Date(order.shipping_date).toLocaleDateString()}</p>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">Tổng cộng</p>
-                                        <p className="text-primary font-bold">{order.total_price} VND</p>
-                                    </div>
-                                </div>
+
+                                <div className="divider my-2"></div>
+
                                 <div className="space-y-4">
                                     {order.order_items.map(item => (
                                         <div key={item.id_product} className="bg-base-200 p-4 rounded-lg">
@@ -100,12 +190,23 @@ const History = () => {
                                                     <p className="text-sm opacity-70">Số lượng: {item.quantity}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-bold text-primary">${item.selling_price}</p>
+                                                    <p className="font-bold text-primary">{item.selling_price.toLocaleString()} VND</p>
                                                     <p className="text-sm opacity-70">Per Unit</p>
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+
+                                <div className="divider my-2"></div>
+
+                                <div className="flex justify-around items-center">
+                                    <div className="text-sm opacity-75">
+                                        Phương thức thanh toán: {order.form_payment}
+                                    </div>
+                                    <div className="text-lg font-bold">
+                                        Tổng tiền: {order.total_price.toLocaleString()} VND
+                                    </div>
                                 </div>
                             </div>
                         </div>

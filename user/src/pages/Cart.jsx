@@ -121,7 +121,7 @@ const Cart = () => {
 
     if (cart.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center">
+            <div className="min-h-64 flex flex-col items-center justify-center">
                 <div className="alert alert-info shadow-lg max-w-md">
                     <div>
                         <FaInfo className="w-4 h-4 mb-3" />
@@ -151,11 +151,11 @@ const Cart = () => {
                 <div className="alert alert-warning shadow-lg mb-6">
                     <FaExclamationTriangle className="w-6 h-6" />
                     <div>
-                        <h3 className="font-bold">Cảnh báo về số lượng tồn kho!</h3>
+                        <h3 className="font-bold">Cảnh báo về số lượng!</h3>
                         <div className="text-sm">
                             {stockErrors.map((error, index) => (
                                 <p key={index}>
-                                    {error.name}: Yêu cầu {error.requestedQuantity} sản phẩm, chỉ còn {error.availableStock} trong kho
+                                    {error.name}: Yêu cầu {error.requestedQuantity} sản phẩm, chỉ còn {error.availableStock}
                                 </p>
                             ))}
                         </div>

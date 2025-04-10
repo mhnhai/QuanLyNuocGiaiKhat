@@ -1,6 +1,9 @@
 import React from 'react';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
+import banner1 from '../banner/banner1.png';
+import banner2 from '../banner/banner2.png';
+import banner3 from '../banner/banner3.png';
 
 const responsive = {
     superLargeDesktop: {
@@ -24,27 +27,26 @@ const responsive = {
 
 const Banner = () => {
     return (
-        <Carousel
-            responsive={responsive}
-            autoPlay={true}
-            autoPlaySpeed={3000}
-            infinite={true}
-            showDots={true}
-            className='relative z-0'
-        >
-            <div>
-                <img src="https://img.daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.webp" alt="Banner 1" className="w-full"/>
-            </div>
-            <div>
-                <img src="https://img.daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.webp" alt="Banner 2" />
-            </div>
-            <div>
-                <img src="https://img.daisyui.com/images/stock/photo-1414694762283-acccc27bca85.webp" alt="Banner 3" />
-            </div>
-            <div>
-                <img src="https://img.daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.webp" alt="Banner 4" />
-            </div>
-        </Carousel>
+        <div className="container mx-auto px-4">
+            <Carousel
+                responsive={responsive}
+                autoPlay={true}
+                autoPlaySpeed={3000}
+                infinite={true}
+                showDots={true}
+                className='relative z-0'
+            >
+                <div>
+                    <img src={banner1} alt="Banner 1" className="w-full h-[500px] object-contain"/>
+                </div>
+                <div>
+                    <img src={banner2} alt="Banner 2" className="w-full h-[500px] object-contain"/>
+                </div>
+                <div>
+                    <img src={banner3} alt="Banner 3" className="w-full h-[500px] object-contain"/>
+                </div>
+            </Carousel>
+        </div>
     );
 };
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import SupplierService from "../services/supplier.service";
-import { Button } from "./Button";
+import SupplierService from "../../services/supplier.service";
+import { Button } from "../Button";
 import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
@@ -51,7 +51,7 @@ const SupplierForm = ({ supplier, onSave, onClose }) => {
             </div>
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Name:</label>
+                    <label className="block text-sm font-medium text-gray-700">Tên nhà cung cấp:</label>
                     <input
                         type="text"
                         name="name"
@@ -79,7 +79,7 @@ const SupplierForm = ({ supplier, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Address:</label>
+                    <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
                     <input
                         type="text"
                         name="address"
@@ -93,7 +93,7 @@ const SupplierForm = ({ supplier, onSave, onClose }) => {
                     ) : null}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone:</label>
+                    <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
                     <input
                         type="text"
                         name="phone"

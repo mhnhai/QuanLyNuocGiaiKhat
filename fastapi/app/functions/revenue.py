@@ -5,28 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-async def calculate_revenue(period: str, value: datetime):
-    try:
-        if period == "year":
-            start_date = datetime(value.year, 1, 1)
-            end_date = datetime(value.year + 1, 1, 1)
-        elif period == "years":
-            start_date = datetime(value.year - 5, 1, 1)
-            end_date = datetime(value.year + 1, 1, 1)
-        else:
-            raise ValueError("Invalid period")
-
-        pipeline = [
-            {"$match": {"order_date": {"$gte": start_date, "$lt": end_date}}},
-            {"$group": {"_id": None, "total_revenue": {"$sum": "$total_price"}}}
-        ]
-
-        result = await orders_collection.aggregate(pipeline).to_list(length=None)
-        return result[0]["total_revenue"] if result else 0.0
-    except Exception as e:
-        logger.error(f"Error calculating revenue: {e}")
-        raise HTTPException(status_code=500, detail="Internal Server Error")
-
 async def calculate_daily_revenue(year: int, month: int):
     try:
         daily_revenue = []
@@ -40,7 +18,7 @@ async def calculate_daily_revenue(year: int, month: int):
         while current_date < end_date:
             next_date = current_date + timedelta(days=1)
             pipeline = [
-                {"$match": {"order_date": {"$gte": current_date, "$lt": next_date}}},
+                {"$match": {"order_date": {"$gte": current_date, "$lt": next_date}, "status": "Đã giao"}},
                 {"$group": {"_id": None, "total_revenue": {"$sum": "$total_price"}}}
             ]
             result = await orders_collection.aggregate(pipeline).to_list(length=None)
@@ -62,8 +40,8 @@ async def calculate_monthly_revenue(year: int):
             else:
                 end_date = datetime(year, month + 1, 1)
             pipeline = [
-                {"$match": {"order_date": {"$gte": start_date, "$lt": end_date}}},
-                {"$group": {"_id": None, "total_revenue": {"$sum": "$total_price"}}}
+                {"$match": {"order_date": {"$gte": start_date, "$lt": end_date}, "status": "Đã giao"}},
+                {"$group": {"_id": None, "total_revenue": {"$sum": "$total_price"},}}
             ]
             result = await orders_collection.aggregate(pipeline).to_list(length=None)
             monthly_revenue.append(result[0]["total_revenue"] if result else 0.0)

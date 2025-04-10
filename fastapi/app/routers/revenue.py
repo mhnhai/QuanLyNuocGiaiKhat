@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from datetime import datetime
 import logging
-from app.functions.revenue import calculate_revenue, calculate_monthly_revenue, calculate_yearly_revenue, calculate_daily_revenue
+from app.functions.revenue import calculate_monthly_revenue, calculate_yearly_revenue, calculate_daily_revenue
 
 router = APIRouter()
 

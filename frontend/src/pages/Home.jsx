@@ -1,13 +1,10 @@
 import React from "react";
 import Dashboard from "../components/Dashboard/Dashboard";
-import ImageUpload from "../components/ImageUpload";
 const Home = () => {
     return (
-        <div className="overflow-auto" style={{maxHeight: '94vh'}}>
-            <h1 className="text-3xl font-bold">Trang chủ</h1>
-            <p>Chào mừng bạn đến với hệ thống quản lý bán bia!</p>
+        <div className="overflow-auto" style={{maxHeight: '92vh'}}>
+            <h1 className="text-3xl font-bold mb-3">Trang chủ</h1>
             <Dashboard />
-            <ImageUpload />
         </div>
     );
 };

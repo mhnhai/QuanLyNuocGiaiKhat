@@ -4,12 +4,20 @@ from app.database import staffs_collection
 from app.models.staff import StaffModel
 from bson import ObjectId
 import logging
-from datetime import datetime, date
 
 router = APIRouter()
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+@router.get("/staffs/check-registered", response_model=dict, tags=["Staffs"])
+async def check_registered(username: str):
+    try:
+        staff = await staffs_collection.find_one({"username": username})
+        return {"registered": staff is not None}  
+    except Exception as e:
+        logger.error(f"Error checking if staff is registered: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/staffs", response_model=List[StaffModel], tags=["Staffs"])
 async def read_staffs():
