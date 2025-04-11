@@ -6,9 +6,9 @@ import { Button } from "../Button";
 import {IoMdClose} from "react-icons/io";
 
 const validationSchema = yup.object({
-    name: yup.string().required('Hãy nhập tên'),
+    name: yup.string().min(2,'Tên nhà cung cấp phải có ít nhất 2 ký tự').max(50,'Tên nhà cung cấp chỉ có tối đa 50 ký tự').required('Hãy nhập tên'),
     email: yup.string().email('Email phải đúng định dạng(abc@1234...)').required('Hãy nhập email'),
-    address: yup.string().required('Hãy nhập địa chỉ'),
+    address: yup.string().max(100,'Địa chỉ chỉ có tối đa 100 ký tự').required('Hãy nhập địa chỉ'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
 });
 

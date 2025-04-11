@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import CustomerService from "../services/customer.service";
 
 const validationSchema = yup.object({
-    name: yup.string().required('Hãy nhập tên'),
-    username: yup.string().required('Hãy nhập tên tài khoản'),
-    password: yup.string().required('Hãy nhập mật khẩu'),
+    name: yup.string().min(2,'Tên khách hàng phải có ít nhất 2 ký tự').max(50,'Tên khách hàng chỉ có tối đa 50 ký tự').required('Hãy nhập tên'),
+    username: yup.string().min(5,'Tên tài khoản phải có ít nhất 5 ký tự').max(20,'Tên tài khoản chỉ có tối đa 20 ký tự').required('Hãy nhập tên tài khoản'),
+    password: yup.string().min(6,'Mật khẩu phải có ít nhất 6 ký tự').max(20,'Mật khẩu chỉ có tối đa 20 ký tự').required('Hãy nhập mật khẩu'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
-    address: yup.string().required('Hãy nhập địa chỉ'),
+    address: yup.string().max(100,'Địa chỉ chỉ có tối đa 100 ký tự').required('Hãy nhập địa chỉ'),
 });
-
+ 
 const CustomerForm = ({ customer }) => {
     const navigate = useNavigate(); 
     

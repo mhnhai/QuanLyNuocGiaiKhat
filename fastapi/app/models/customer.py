@@ -8,7 +8,7 @@ class CustomerModel(BaseModel):
     username: str = Field(..., min_length=5, max_length=20)
     password: str = Field(..., min_length=6, max_length=20)
     phone: str = Field(..., min_length=10, max_length=10)
-    address: str = Field(..., min_length=1, max_length=50)
+    address: str = Field(..., min_length=1, max_length=100)
     role_account: str = Field(default="customer")
     
     class Config:

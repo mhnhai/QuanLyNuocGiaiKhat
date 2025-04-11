@@ -11,12 +11,12 @@ import uploadService from '../../services/upload.service';
 import { FaTrash } from 'react-icons/fa';
 
 const validationSchema = yup.object({
-    name: yup.string().required('Nhập vào tên'),
+    name: yup.string().min(2,'Tên sản phẩm phải có ít nhất 2 ký tự').max(100,'Tên sản phẩm chỉ có tối đa 100 ký tự').required('Nhập vào tên'),
     selling_price: yup.number().required('Nhập số tiền').positive('Số tiền phải dương'),
     category: yup.string().required('Chọn loại hàng'),
-    volume: yup.string().required('Nhập dung tích sản phẩm'),
-    origin: yup.string().required('Nhập nguồn gốc'),
-    description: yup.string().required('Nhập mô tả'),
+    volume: yup.string().min(2,'Dung tích sản phẩm phải có ít nhất 2 ký tự').max(10,'Dung tích sản phẩm chỉ có tối đa 10 ký tự').required('Nhập dung tích sản phẩm'),
+    origin: yup.string().min(2,'Nguồn gốc sản phẩm phải có ít nhất 2 ký tự').max(30,'Nguồn gốc sản phẩm chỉ có tối đa 30 ký tự').required('Nhập nguồn gốc'),
+    description: yup.string().min(10,'Mô tả phải có ít nhất 10 ký tự').max(1000,'Mô tả chỉ có tối đa 1000 ký tự').required('Nhập mô tả'),
     image: yup.string().required('Nhập ảnh'),
     supplier_price: yup.array().of(
         yup.object({

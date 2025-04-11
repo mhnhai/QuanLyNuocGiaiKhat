@@ -62,18 +62,15 @@ const OrderList = () => {
         setModalIsOpen(!modalIsOpen);
     };
 
-    const handleOrderSave = (savedOrder) => {
-        setOrders((prevOrders) => {
-            const existingOrderIndex = prevOrders.findIndex(order => order._id === savedOrder._id);
-            if (existingOrderIndex !== -1) {
-                const updatedOrders = [...prevOrders];
-                updatedOrders[existingOrderIndex] = savedOrder;
-                return updatedOrders;
-            } else {
-                return [...prevOrders, savedOrder];
-            }
-        });
-        toggleModal();
+
+    const handleOrderSave = async (savedOrder) => {
+        try {
+            // Fetch fresh data from server
+            await fetchOrders();
+            toggleModal();
+        } catch (error) {
+            console.error('Error refreshing order list:', error);
+        }
     };
 
     const handleSearch = (searchTerm) => {
@@ -148,7 +145,12 @@ const OrderList = () => {
                                 <tr key={order._id}>
                                     <td className="py-2 px-4 border">{customerNames[order.id_customer]}</td>
                                     <td className="py-2 px-4 border">{formatDateTime(order.order_date)}</td>
-                                    <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
+                                    {order.shipping_date === null && (
+                                        <td className="py-2 px-4 border">Chưa giao hàng</td>
+                                    )}
+                                    {order.shipping_date !== null && (
+                                        <td className="py-2 px-4 border">{formatDateTime(order.shipping_date)}</td>
+                                    )}
                                     <td className="py-2 px-4 border">{order.total_price.toLocaleString()}</td>
                                     <td className="py-2 px-4 border">{order.status}</td>
                                     <td className="py-2 px-4 border">
@@ -158,8 +160,8 @@ const OrderList = () => {
                                                 <FaEye/>
                                                 Xem chi tiết
                                             </button>
-                                            {/* chỉ có nút xóa đơn hàng khi đơn hàng ở trạng thái chưa xác nhận, đã xác nhận, đã hủy */}
-                                            {(order.status === "Chưa xác nhận" || order.status === "Đã xác nhận" || order.status === "Đã hủy") && (
+                                            {/* chỉ có nút xóa đơn hàng khi đơn hàng ở trạng thái đã hủy */}
+                                            {( order.status === "Đã hủy") && (
                                                 <button onClick={() => handleDelete(order._id)}
                                                         className="btn btn-sm btn-outline btn-error">
                                                     <FaTrash/>

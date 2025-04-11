@@ -255,7 +255,7 @@ const OrderForm = ({ order, onSave, onClose }) => {
                     <input type="hidden" name="order_date" value={formData.order_date}/>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày chuyển hàng: {formatDateTime(formData.shipping_date)}</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày giao hàng: {formatDateTime(formData.shipping_date)}</label>
                     <input type="hidden" name="shipping_date" value={formData.shipping_date}/>
                 </div>
                 <div>
