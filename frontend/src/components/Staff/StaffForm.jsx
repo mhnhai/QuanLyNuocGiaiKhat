@@ -8,22 +8,26 @@ import RoleService from "../../services/role.service";
 import {Button} from "../Button";
 import {IoMdClose} from "react-icons/io";
 
-const validationSchema = yup.object({
-    name: yup.string().required('Hãy nhập tên'),
-    username: yup.string().required('Hãy nhập tên tài khoản'),
-    password: yup.string().required('Hãy nhập mật khẩu'),
-    position: yup.string().required('Hãy chọn vị trí công việc'),
-    salary: yup.number().required('Salary is required').positive('Salary must be a positive number'),
-    phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
-    role_account: yup.string().required('Hãy chọn vai trò cho tài khoản'),
-    address: yup.string().required('Hãy nhập địa chỉ'),
-});
-
 const StaffForm = ({ staff, onSave, onClose }) => {
+    const validationSchema = yup.object({
+        name: yup.string().required('Hãy nhập tên'),
+        username: yup.string().required('Hãy nhập tên tài khoản'),
+        email: yup.string().email('Email không hợp lệ').max(100, 'Email chỉ có tối đa 100 ký tự').required('Hãy nhập email'),
+        password: staff
+            ? yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').max(20, 'Mật khẩu chỉ có tối đa 20 ký tự')
+            : yup.string().required('Hãy nhập mật khẩu'),
+        position: yup.string().required('Hãy chọn vị trí công việc'),
+        salary: yup.number().required('Salary is required').positive('Salary must be a positive number'),
+        phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
+        role_account: yup.string().required('Hãy chọn vai trò cho tài khoản'),
+        address: yup.string().required('Hãy nhập địa chỉ'),
+    });
+
     const formik = useFormik({
         initialValues: {
             name: '',
             username: '',
+            email: '',
             password: '',
             position: '',
             salary: '',
@@ -34,16 +38,20 @@ const StaffForm = ({ staff, onSave, onClose }) => {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
+                const payload = { ...values };
+                if (staff && !payload.password) {
+                    delete payload.password;
+                }
                 let response;
                 if (staff) {
-                    response = await StaffService.update(staff._id, values);
+                    response = await StaffService.update(staff._id, payload);
                 } else {
                     const isRegistered = await StaffService.checkRegistered(values.username);
                     if (isRegistered) {
                         alert('Tên tài khoản đã tồn tại');
                         return;
                     }
-                    response = await StaffService.create(values);
+                    response = await StaffService.create(payload);
                 }
                 onSave(response.data);
             } catch (error) {
@@ -132,6 +140,20 @@ const StaffForm = ({ staff, onSave, onClose }) => {
                     />
                     {formik.touched.username && formik.errors.username ? (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.username}</p>
+                    ) : null}
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Email:</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                    {formik.touched.email && formik.errors.email ? (
+                        <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
                     ) : null}
                 </div>
                 <div>

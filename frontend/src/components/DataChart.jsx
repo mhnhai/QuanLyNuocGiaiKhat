@@ -107,13 +107,11 @@ const DataChart = () => {
     };
 
     return (
-        <div className="card mb-4 bg-base-100 shadow-lg p-6 w-full flex flex-col items-center">
-            <div className="flex justify-between items-center gap-3 mb-4 w-full">
-                <div className="flex">
-                    <p className="font-bold text-2xl">Biểu đồ thống kê</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <p>Thống kê theo:</p>
+        <div className="card bg-base-100 shadow-md border border-base-300 p-4 sm:p-6 w-full">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3 mb-4 w-full">
+                <p className="font-bold text-xl text-base-content">Biểu đồ thống kê</p>
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-base-content/60">Thống kê theo:</span>
                     <select
                         className="select select-sm select-primary"
                         value={period}
@@ -147,7 +145,7 @@ const DataChart = () => {
             </div>
             {/* Biểu đồ */}
             {revenueData && costData && (
-                <div className="w-[1200px] max-w-full bg-white p-6 rounded-lg shadow-lg">
+                <div className="w-full bg-base-200 p-4 sm:p-6 rounded-xl border border-base-300">
                     <canvas ref={chartRef} style={{width: '100%', height: '500px'}}></canvas>
                 </div>
             )}

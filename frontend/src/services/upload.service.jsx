@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8000/api/upload-image',  // URL của FastAPI server
+    baseURL: 'http://localhost:8000/api/upload-image',
+    withCredentials: true,
     headers: {
       'Content-Type': 'multipart/form-data',
     }

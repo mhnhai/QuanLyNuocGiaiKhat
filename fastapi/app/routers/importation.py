@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from app.database import importations_collection
 from app.models.importation import ImportationModel
+from app.dependencies.auth import require_staff
 from bson import ObjectId
 import logging
 
@@ -11,7 +12,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 @router.get("/importations", response_model=List[ImportationModel], tags=["Importations"])
-async def read_importations():
+async def read_importations(_user: dict = Depends(require_staff)):
     try:
         importations = []
         async for importation in importations_collection.find():
@@ -23,7 +24,7 @@ async def read_importations():
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.get("/importations/{importation_id}", response_model=ImportationModel, tags=["Importations"])
-async def read_importation(importation_id: str):
+async def read_importation(importation_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(importation_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -37,7 +38,7 @@ async def read_importation(importation_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/importations", response_model=ImportationModel, tags=["Importations"])
-async def create_importation(importation: ImportationModel):
+async def create_importation(importation: ImportationModel, _user: dict = Depends(require_staff)):
     try:
         importation_dict = importation.dict(by_alias=True, exclude_unset=True)
         
@@ -52,7 +53,7 @@ async def create_importation(importation: ImportationModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.put("/importations/{importation_id}", response_model=ImportationModel, tags=["Importations"])
-async def update_importation(importation_id: str, importation: ImportationModel):
+async def update_importation(importation_id: str, importation: ImportationModel, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(importation_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -78,7 +79,7 @@ async def update_importation(importation_id: str, importation: ImportationModel)
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.delete("/importations/{importation_id}", response_model=dict, tags=["Importations"])
-async def delete_importation(importation_id: str):
+async def delete_importation(importation_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(importation_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -91,7 +92,7 @@ async def delete_importation(importation_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.delete("/importations", response_model=dict, tags=["Importations"])
-async def delete_all_importations():
+async def delete_all_importations(_user: dict = Depends(require_staff)):
     try:
         result = await importations_collection.delete_many({})
         return {"deleted_count": result.deleted_count}

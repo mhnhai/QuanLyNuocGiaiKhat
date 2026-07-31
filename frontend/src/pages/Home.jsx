@@ -1,9 +1,21 @@
 import React from "react";
+import PageHeader from "../components/PageHeader";
 import Dashboard from "../components/Dashboard/Dashboard";
+
 const Home = () => {
+    const today = new Date().toLocaleDateString("vi-VN", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+
     return (
-        <div className="overflow-auto" style={{maxHeight: '92vh'}}>
-            <h1 className="text-3xl font-bold mb-3">Trang chủ</h1>
+        <div>
+            <PageHeader
+                title="Tổng quan"
+                subtitle={today}
+            />
             <Dashboard />
         </div>
     );

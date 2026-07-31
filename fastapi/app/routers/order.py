@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from app.database import orders_collection
 from app.models.order import OrderModel
+from app.dependencies.auth import require_staff, get_current_user
 from bson import ObjectId
 import logging
 import datetime
@@ -12,8 +13,12 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 @router.get("/orders/customer/{id_customer}", response_model=List[OrderModel], tags=["Orders"])
-async def get_orders_by_customer(id_customer: str):
+async def get_orders_by_customer(id_customer: str, user: dict = Depends(get_current_user)):
     try:
+        if user.get("type") == "customer" and user.get("sub") != id_customer:
+            raise HTTPException(status_code=403, detail="Access denied")
+        if user.get("type") != "customer" and user.get("role") not in ("admin", "staff"):
+            raise HTTPException(status_code=403, detail="Access denied")
         orders = []
         async for order in orders_collection.find({"id_customer": id_customer}).sort("order_date", -1):
             order["_id"] = str(order["_id"])  # Convert ObjectId to string
@@ -24,7 +29,7 @@ async def get_orders_by_customer(id_customer: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/orders/count", response_model=dict,  tags=["Orders"])
-async def count_orders(year: int, month: int = None, day: int = None):
+async def count_orders(year: int, month: int = None, day: int = None, _user: dict = Depends(require_staff)):
     try:
         # Xác định khoảng thời gian bắt đầu và kết thúc
         if day is not None and month is not None:
@@ -52,7 +57,7 @@ async def count_orders(year: int, month: int = None, day: int = None):
 
 
 @router.get("/orders", response_model=List[OrderModel], tags=["Orders"])
-async def read_orders():
+async def read_orders(_user: dict = Depends(require_staff)):
     try:
         orders = []
         async for order in orders_collection.find().sort("order_date", -1):
@@ -64,7 +69,7 @@ async def read_orders():
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.get("/orders/{order_id}", response_model=OrderModel, tags=["Orders"])
-async def read_order(order_id: str):
+async def read_order(order_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(order_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -78,8 +83,12 @@ async def read_order(order_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/orders", response_model=OrderModel, tags=["Orders"])
-async def create_order(order: OrderModel):
+async def create_order(order: OrderModel, user: dict = Depends(get_current_user)):
     try:
+        if user.get("type") == "customer" and order.id_customer != user.get("sub"):
+            raise HTTPException(status_code=403, detail="Access denied")
+        if user.get("type") != "customer" and user.get("role") not in ("admin", "staff"):
+            raise HTTPException(status_code=403, detail="Access denied")
         order_dict = order.dict(by_alias=True, exclude_unset=True)
 
         if "_id" in order_dict:
@@ -93,33 +102,70 @@ async def create_order(order: OrderModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.put("/orders/{order_id}", response_model=OrderModel, tags=["Orders"])
-async def update_order(order_id: str, order: OrderModel):
+async def update_order(order_id: str, order: OrderModel, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(order_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
-        
+
         order_dict = order.dict(by_alias=True, exclude_unset=True)
 
         if "_id" in order_dict:
-            del order_dict["_id"]  # Remove the _id field from the update data
-        
+            del order_dict["_id"]
+
         result = await orders_collection.update_one(
             {"_id": ObjectId(order_id)},
-            {"$set": order_dict}
+            {"$set": order_dict},
         )
-        
+
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Order not found")
-        
+
         updated_order = await orders_collection.find_one({"_id": ObjectId(order_id)})
-        updated_order["_id"] = str(updated_order["_id"])  # Convert ObjectId to string
+        updated_order["_id"] = str(updated_order["_id"])
         return OrderModel(**updated_order)
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error updating order with id {order_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    
+
+
+@router.patch("/orders/{order_id}/cancel", response_model=OrderModel, tags=["Orders"])
+async def cancel_order(order_id: str, user: dict = Depends(get_current_user)):
+    try:
+        if user.get("type") != "customer":
+            raise HTTPException(status_code=403, detail="Only customers can cancel orders")
+        if not ObjectId.is_valid(order_id):
+            raise HTTPException(status_code=400, detail="Invalid ObjectId")
+
+        order = await orders_collection.find_one({"_id": ObjectId(order_id)})
+        if order is None:
+            raise HTTPException(status_code=404, detail="Order not found")
+        if order.get("id_customer") != user.get("sub"):
+            raise HTTPException(status_code=403, detail="Access denied")
+        if order.get("status") != "Chưa xác nhận":
+            raise HTTPException(
+                status_code=400,
+                detail="Chỉ có thể hủy đơn hàng chưa xác nhận",
+            )
+
+        await orders_collection.update_one(
+            {"_id": ObjectId(order_id)},
+            {"$set": {"status": "Đã hủy"}},
+        )
+
+        updated_order = await orders_collection.find_one({"_id": ObjectId(order_id)})
+        updated_order["_id"] = str(updated_order["_id"])
+        return OrderModel(**updated_order)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error canceling order with id {order_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 @router.delete("/orders/{order_id}", response_model=dict, tags=["Orders"])
-async def delete_order(order_id: str):
+async def delete_order(order_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(order_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -132,7 +178,7 @@ async def delete_order(order_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.delete("/orders", response_model=dict, tags=["Orders"])
-async def delete_all_orders():
+async def delete_all_orders(_user: dict = Depends(require_staff)):
     try:
         result = await orders_collection.delete_many({})
         return {"deleted_count": result.deleted_count}

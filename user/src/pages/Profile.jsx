@@ -2,20 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import CustomerService from "../services/customer.service";
+import { useAuth } from "../context/AuthContext";
 
 const validationSchema = yup.object({
     name: yup.string().required('Hãy nhập tên'),
     username: yup.string().required('Hãy nhập tên tài khoản'),
-    password: yup.string().required('Hãy nhập mật khẩu'),
+    password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').max(20, 'Mật khẩu chỉ có tối đa 20 ký tự'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
     address: yup.string().required('Hãy nhập địa chỉ'),
 });
 
 const Profile = () => {
-    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const { user: currentUser } = useAuth();
     const [user, setUser] = useState(null);
+
     useEffect(() => {
         const fetchUser = async () => {
+            if (!currentUser?.id) return;
             try {
                 const response = await CustomerService.getById(currentUser.id);
                 setUser(response.data);
@@ -25,7 +28,7 @@ const Profile = () => {
         };
 
         fetchUser();
-    }, []);
+    }, [currentUser?.id]);
 
     const formik = useFormik({
         initialValues: {
@@ -39,8 +42,12 @@ const Profile = () => {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
-                const response = await CustomerService.update(user._id, values);
-                alert('Profile updated successfully');
+                const payload = { ...values };
+                if (!payload.password) {
+                    delete payload.password;
+                }
+                await CustomerService.update(user._id, payload);
+                alert('Cập nhật thông tin thành công');
             } catch (error) {
                 console.error('Error updating profile:', error);
             }
@@ -49,9 +56,13 @@ const Profile = () => {
 
     useEffect(() => {
         if (user) {
-            formik.setValues(user);
+            formik.setValues({ ...user, password: '' });
         }
     }, [user]);
+
+    if (!currentUser) {
+        return <p className="text-center">Vui lòng đăng nhập để xem thông tin cá nhân.</p>;
+    }
 
     return (
         <div className="flex items-center justify-center h-screen">
@@ -87,7 +98,7 @@ const Profile = () => {
                 ) : null}
             </div>
             <div className="mb-4">
-                <label className="block">Mật khẩu:</label>
+                <label className="block">Mật khẩu mới (để trống nếu không đổi):</label>
                 <input
                     type="password"
                     name="password"

@@ -1,23 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import CustomerService from "../../services/customer.service";
 import {Button} from "../Button";
 import {IoMdClose} from "react-icons/io";
 
-const validationSchema = yup.object({
-    name: yup.string().min(2,'Tên khách hàng phải có ít nhất 2 ký tự').max(50,'Tên khách hàng chỉ có tối đa 50 ký tự').required('Hãy nhập tên'),
-    username: yup.string().min(5,'Tên tài khoản phải có ít nhất 5 ký tự').max(20,'Tên tài khoản chỉ có tối đa 20 ký tự').required('Hãy nhập tên tài khoản'),
-    password: yup.string().min(6,'Mật khẩu phải có ít nhất 6 ký tự').max(20,'Mật khẩu chỉ có tối đa 20 ký tự').required('Hãy nhập mật khẩu'),
-    phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
-    address: yup.string().max(100,'Địa chỉ chỉ có tối đa 100 ký tự').required('Hãy nhập địa chỉ'),
-});
-
 const CustomerForm = ({ customer, onSave, onClose }) => {
+    const validationSchema = yup.object({
+        name: yup.string().min(2,'Tên khách hàng phải có ít nhất 2 ký tự').max(50,'Tên khách hàng chỉ có tối đa 50 ký tự').required('Hãy nhập tên'),
+        username: yup.string().min(5,'Tên tài khoản phải có ít nhất 5 ký tự').max(20,'Tên tài khoản chỉ có tối đa 20 ký tự').required('Hãy nhập tên tài khoản'),
+        email: yup.string().email('Email không hợp lệ').max(100, 'Email chỉ có tối đa 100 ký tự').required('Hãy nhập email'),
+        password: customer
+            ? yup.string().min(6,'Mật khẩu phải có ít nhất 6 ký tự').max(20,'Mật khẩu chỉ có tối đa 20 ký tự')
+            : yup.string().min(6,'Mật khẩu phải có ít nhất 6 ký tự').max(20,'Mật khẩu chỉ có tối đa 20 ký tự').required('Hãy nhập mật khẩu'),
+        phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
+        address: yup.string().max(100,'Địa chỉ chỉ có tối đa 100 ký tự').required('Hãy nhập địa chỉ'),
+    });
+
     const formik = useFormik({
         initialValues: {
             name: '',
             username: '',
+            email: '',
             password: '',
             phone: '',
             address: '',
@@ -25,16 +29,20 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
+                const payload = { ...values };
+                if (customer && !payload.password) {
+                    delete payload.password;
+                }
                 let response;
                 if (customer) {
-                    response = await CustomerService.update(customer._id, values);
+                    response = await CustomerService.update(customer._id, payload);
                 } else {
                     const isRegistered = await CustomerService.checkRegistered(values.username);
                     if (isRegistered) {
                         alert('Tên tài khoản đã tồn tại');
                         return;
                     }
-                    response = await CustomerService.create(values);
+                    response = await CustomerService.create(payload);
                 }
                 onSave(response.data);
             } catch (error) {
@@ -48,7 +56,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
         if (customer) {
             formik.setValues(customer);
         }
-    }, [customer]);
+    }, [customer, formik]);
 
     return (
         <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -84,6 +92,20 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
                     />
                     {formik.touched.username && formik.errors.username ? (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.username}</p>
+                    ) : null}
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Email:</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    />
+                    {formik.touched.email && formik.errors.email ? (
+                        <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
                     ) : null}
                 </div>
                 <div>

@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import SearchBar from "../SearchBar";
 import SupplierFilter from "../SupplierFilter";
 import { FaEye, FaTrash } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -13,7 +14,7 @@ const ProductList = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [originalProducts, setOriginalProducts] = useState([]);
     const [sortConfig, setSortConfig] = useState({ sort_by: "name", order: 1 });
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
 
     useEffect(() => {
         fetchProducts();

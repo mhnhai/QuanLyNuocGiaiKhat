@@ -1,12 +1,12 @@
 import React from "react";
+import PageHeader from "../components/PageHeader";
 import OrderList from "../components/Order/OrderList";
-const Orders = () => {
-    return (
-        <div>
-            <h1 className="text-3xl font-bold">Trang đơn hàng</h1>
-            <OrderList />
-        </div>
-    );
-};
+
+const Orders = () => (
+    <div>
+        <PageHeader title="Đơn hàng" subtitle="Theo dõi và cập nhật trạng thái đơn hàng" />
+        <OrderList />
+    </div>
+);
 
 export default Orders;

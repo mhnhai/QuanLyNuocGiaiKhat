@@ -1,12 +1,12 @@
 import React from "react";
+import PageHeader from "../components/PageHeader";
 import StaffList from "../components/Staff/StaffList";
-const Staffs = () => {
-    return (
-        <div>
-            <h1 className="text-3xl font-bold">Trang nhân viên</h1>
-            <StaffList />
-        </div>
-    );
-};
+
+const Staffs = () => (
+    <div>
+        <PageHeader title="Nhân viên" subtitle="Quản lý tài khoản và phân quyền nhân viên" />
+        <StaffList />
+    </div>
+);
 
 export default Staffs;

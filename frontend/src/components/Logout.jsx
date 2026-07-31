@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const Logout = ({ onLogout }) => {
+const Logout = () => {
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     useEffect(() => {
-        localStorage.removeItem('user');
-        onLogout();
-        navigate('/login');
-    }, [navigate, onLogout]);
+        const performLogout = async () => {
+            await logout();
+            navigate('/login');
+        };
+        performLogout();
+    }, [logout, navigate]);
 
     return null;
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaShoppingCart } from 'react-icons/fa';
 import orderService from '../../services/order.service';
 
 const OrderCount = () => {
@@ -10,7 +11,7 @@ const OrderCount = () => {
         const fetchOrderCount = async () => {
             try {
                 let year, month, day;
-                
+
                 if (filterType === 'day') {
                     year = selectedDate.getFullYear();
                     month = selectedDate.getMonth() + 1;
@@ -20,12 +21,12 @@ const OrderCount = () => {
                     year = parseInt(yearStr);
                     month = parseInt(monthStr);
                     day = null;
-                } else if (filterType === 'year') {
+                } else {
                     year = selectedDate.getFullYear();
                     month = null;
                     day = null;
                 }
-                
+
                 const count = await orderService.getOrderCount(year, month, day);
                 setOrderCount(count.data.total_orders);
             } catch (error) {
@@ -38,41 +39,29 @@ const OrderCount = () => {
 
     const handleDateChange = (e) => {
         if (filterType === 'year') {
-            const year = parseInt(e.target.value);
-            setSelectedDate(new Date(year, 0, 1));
+            setSelectedDate(new Date(parseInt(e.target.value), 0, 1));
         } else {
             setSelectedDate(new Date(e.target.value));
         }
     };
 
-    const formatDate = (date) => {
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        
-        switch (filterType) {
-            case 'day':
-                return `${day}/${month}/${year}`;
-            case 'month':
-                return `${month}/${year}`;
-            case 'year':
-                return year.toString();
-            default:
-                return `${day}/${month}/${year}`;
-        }
-    };
-
     return (
-        <div className="card bg-base-100 w-96 shadow-lg p-4">
-            <div className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">Số lượng đơn hàng</h2>
+        <div className="card bg-base-100 shadow-md border border-base-300 h-full hover:shadow-lg transition-shadow">
+            <div className="card-body gap-3">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <p className="text-sm text-base-content/60 font-medium">Đơn hàng</p>
+                        <p className="text-4xl font-bold text-accent mt-2">{orderCount}</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-accent/10 text-accent">
+                        <FaShoppingCart className="text-2xl" />
+                    </div>
                 </div>
-                <div className="flex gap-2 items-center">
-                    <select 
-                        value={filterType} 
+                <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-base-300">
+                    <select
+                        value={filterType}
                         onChange={(e) => setFilterType(e.target.value)}
-                        className="select select-primary select-bordered select-sm w-44"
+                        className="select select-bordered select-sm flex-1 min-w-[7rem]"
                     >
                         <option value="day">Theo ngày</option>
                         <option value="month">Theo tháng</option>
@@ -81,7 +70,7 @@ const OrderCount = () => {
                     {filterType === 'day' && (
                         <input
                             type="date"
-                            className="input input-primary input-sm flex-1"
+                            className="input input-bordered input-sm flex-1"
                             value={selectedDate.toISOString().split('T')[0]}
                             onChange={handleDateChange}
                         />
@@ -89,7 +78,7 @@ const OrderCount = () => {
                     {filterType === 'month' && (
                         <input
                             type="month"
-                            className="input input-primary input-sm flex-1"
+                            className="input input-bordered input-sm flex-1"
                             value={selectedDate.toISOString().slice(0, 7)}
                             onChange={handleDateChange}
                         />
@@ -97,7 +86,7 @@ const OrderCount = () => {
                     {filterType === 'year' && (
                         <input
                             type="number"
-                            className="input input-primary input-sm flex-1"
+                            className="input input-bordered input-sm flex-1"
                             value={selectedDate.getFullYear()}
                             onChange={handleDateChange}
                             min="2000"
@@ -106,7 +95,6 @@ const OrderCount = () => {
                     )}
                 </div>
             </div>
-            <p className="text-4xl font-bold text-primary">{orderCount}</p>
         </div>
     );
 };

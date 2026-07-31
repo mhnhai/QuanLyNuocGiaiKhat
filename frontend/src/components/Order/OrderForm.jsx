@@ -10,12 +10,13 @@ import { FaDeleteLeft } from "react-icons/fa6";
 import { IoMdAddCircleOutline, IoMdClose } from "react-icons/io";
 import Select from 'react-select';
 import staffService from '../../services/staff.service';
+import { useAuth } from '../../context/AuthContext';
 
 const OrderForm = ({ order, onSave, onClose }) => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
     const [formData, setFormData] = useState(order || {
         id_customer: '',
-        id_staff: user.id,
+        id_staff: user?.id || '',
         order_date: new Date(),
         shipping_date: null,
         form_payment: '',

@@ -1,5 +1,6 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
+from app.dependencies.auth import require_staff
 import os
 from uuid import uuid4
 
@@ -9,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/upload-image")
-async def upload_image(file: UploadFile = File(...)):
+async def upload_image(file: UploadFile = File(...), _user: dict = Depends(require_staff)):
     
     file_extension = file.filename.split(".")[-1]
     file_name = f"{uuid4()}.{file_extension}"
@@ -24,7 +25,7 @@ async def get_image(filename: str):
     return FileResponse(file_path)
 
 @router.delete("/upload-image/{filename}")
-async def delete_image(filename: str):
+async def delete_image(filename: str, _user: dict = Depends(require_staff)):
     image_path = f"{IMAGE_PATH}{filename}"
     if os.path.exists(image_path):
         os.remove(image_path)

@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from datetime import datetime
 import logging
 from app.functions.revenue import calculate_monthly_revenue, calculate_yearly_revenue, calculate_daily_revenue
+from app.dependencies.auth import require_staff
 
 router = APIRouter()
 
@@ -9,7 +10,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 @router.get("/revenue")
-async def get_revenue(period: str = Query(..., enum=["month", "year", "years"]), value: int = Query(...)):
+async def get_revenue(period: str = Query(..., enum=["month", "year", "years"]), value: int = Query(...), _user: dict = Depends(require_staff)):
     try:
     
         if period == "year":

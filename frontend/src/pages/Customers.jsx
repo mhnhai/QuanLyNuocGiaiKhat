@@ -1,12 +1,12 @@
 import React from "react";
+import PageHeader from "../components/PageHeader";
 import CustomerList from "../components/Customer/CustomerList";
-const Customers = () => {
-    return (
-        <div>
-            <h1 className="text-3xl font-bold">Trang khách hàng</h1>
-            <CustomerList />
-        </div>
-    );
-};
+
+const Customers = () => (
+    <div>
+        <PageHeader title="Khách hàng" subtitle="Quản lý tài khoản và thông tin khách hàng" />
+        <CustomerList />
+    </div>
+);
 
 export default Customers;

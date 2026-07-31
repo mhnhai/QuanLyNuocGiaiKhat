@@ -6,12 +6,13 @@ import Select from 'react-select';
 import { FaDeleteLeft } from "react-icons/fa6";
 import { Button, DeleteButton, EditButton } from "../Button";
 import {IoMdAddCircleOutline, IoMdClose} from "react-icons/io";
+import { useAuth } from "../../context/AuthContext";
 
 const ImportationForm = ({ importation, onSave, onClose }) => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
     const [formData, setFormData] = useState(importation || {
         id_supplier: '',
-        id_staff: user.id,
+        id_staff: user?.id || '',
         import_date: new Date().toISOString(),
         total_price: '',
         import_items: [{ id_product: '', quantity: '', import_price: '' }]

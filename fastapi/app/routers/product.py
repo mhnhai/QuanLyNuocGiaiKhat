@@ -1,17 +1,17 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from app.database import products_collection
 from app.models.product import ProductModel
+from app.dependencies.auth import require_staff
 from bson import ObjectId
 import logging
-
 router = APIRouter()
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 @router.get("/products/count", response_model=dict, tags=["Products"])
-async def count_products():
+async def count_products(_user: dict = Depends(require_staff)):
     try:
         count = await products_collection.count_documents({})
         logger.info(f"Product count: {count}")
@@ -81,7 +81,7 @@ async def get_product_name(product_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/products", response_model=ProductModel, tags=["Products"])
-async def create_product(product: ProductModel):
+async def create_product(product: ProductModel, _user: dict = Depends(require_staff)):
     try:
         product_dict = product.dict(by_alias=True, exclude_unset=True)
         if "_id" in product_dict:
@@ -94,7 +94,7 @@ async def create_product(product: ProductModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/products/{product_id}", response_model=ProductModel, tags=["Products"])
-async def update_product(product_id: str, product: ProductModel):
+async def update_product(product_id: str, product: ProductModel, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(product_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -119,7 +119,7 @@ async def update_product(product_id: str, product: ProductModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.delete("/products/{product_id}", response_model=dict, tags=["Products"])
-async def delete_product(product_id: str):
+async def delete_product(product_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(product_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -132,7 +132,7 @@ async def delete_product(product_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.delete("/products", response_model=dict, tags=["Products"])
-async def delete_all_products():
+async def delete_all_products(_user: dict = Depends(require_staff)):
     try:
         result = await products_collection.delete_many({})
         return {"deleted_count": result.deleted_count}

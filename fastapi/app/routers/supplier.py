@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from app.database import suppliers_collection
 from pydantic import ValidationError
 from app.models.supplier import SupplierModel
+from app.dependencies.auth import require_staff
 from bson import ObjectId
 import logging
 
@@ -12,7 +13,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 @router.get("/suppliers", response_model=List[SupplierModel], tags=["Suppliers"])
-async def read_suppliers():
+async def read_suppliers(_user: dict = Depends(require_staff)):
     try:
         suppliers = []
         async for supplier in suppliers_collection.find():
@@ -24,7 +25,7 @@ async def read_suppliers():
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.get("/suppliers/{supplier_id}", response_model=SupplierModel, tags=["Suppliers"])
-async def read_supplier(supplier_id: str):
+async def read_supplier(supplier_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(supplier_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -38,7 +39,7 @@ async def read_supplier(supplier_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.post("/suppliers", response_model=SupplierModel, tags=["Suppliers"])
-async def create_supplier(supplier: SupplierModel):
+async def create_supplier(supplier: SupplierModel, _user: dict = Depends(require_staff)):
     try:
         supplier_dict = supplier.dict(by_alias=True, exclude_unset=True)
         if "_id" in supplier_dict:
@@ -54,7 +55,7 @@ async def create_supplier(supplier: SupplierModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.put("/suppliers/{supplier_id}", response_model=SupplierModel, tags=["Suppliers"])
-async def update_supplier(supplier_id: str, supplier: SupplierModel):
+async def update_supplier(supplier_id: str, supplier: SupplierModel, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(supplier_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -79,7 +80,7 @@ async def update_supplier(supplier_id: str, supplier: SupplierModel):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 @router.delete("/suppliers/{supplier_id}", response_model=dict, tags=["Suppliers"])
-async def delete_supplier(supplier_id: str):
+async def delete_supplier(supplier_id: str, _user: dict = Depends(require_staff)):
     try:
         if not ObjectId.is_valid(supplier_id):
             raise HTTPException(status_code=400, detail="Invalid ObjectId")
@@ -92,7 +93,7 @@ async def delete_supplier(supplier_id: str):
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.delete("/suppliers", response_model=dict, tags=["Suppliers"])
-async def delete_all_suppliers():
+async def delete_all_suppliers(_user: dict = Depends(require_staff)):
     try:
         result = await suppliers_collection.delete_many({})
         return {"deleted_count": result.deleted_count}

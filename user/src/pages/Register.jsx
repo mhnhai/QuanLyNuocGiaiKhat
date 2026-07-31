@@ -7,6 +7,7 @@ import CustomerService from "../services/customer.service";
 const validationSchema = yup.object({
     name: yup.string().min(2,'Tên khách hàng phải có ít nhất 2 ký tự').max(50,'Tên khách hàng chỉ có tối đa 50 ký tự').required('Hãy nhập tên'),
     username: yup.string().min(5,'Tên tài khoản phải có ít nhất 5 ký tự').max(20,'Tên tài khoản chỉ có tối đa 20 ký tự').required('Hãy nhập tên tài khoản'),
+    email: yup.string().email('Email không hợp lệ').max(100, 'Email chỉ có tối đa 100 ký tự').required('Hãy nhập email'),
     password: yup.string().min(6,'Mật khẩu phải có ít nhất 6 ký tự').max(20,'Mật khẩu chỉ có tối đa 20 ký tự').required('Hãy nhập mật khẩu'),
     phone: yup.string().length(10, 'Số điện thoại phải có 10 chữ số').required('Hãy nhập số điện thoại'),
     address: yup.string().max(100,'Địa chỉ chỉ có tối đa 100 ký tự').required('Hãy nhập địa chỉ'),
@@ -19,6 +20,7 @@ const CustomerForm = ({ customer }) => {
         initialValues: {
             name: '',
             username: '',
+            email: '',
             password: '',
             phone: '',
             role_account: 'customer',
@@ -45,7 +47,7 @@ const CustomerForm = ({ customer }) => {
         if (customer) {
             formik.setValues(customer);
         }
-    }, [customer]);
+    }, [customer, formik]);
 
     return (
         <div className="flex items-center justify-center h-screen">
@@ -77,6 +79,20 @@ const CustomerForm = ({ customer }) => {
                     />
                     {formik.touched.username && formik.errors.username ? (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.username}</p>
+                    ) : null}
+                </div>
+                <div className="mb-4">
+                    <label className="block">Email:</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
+                    {formik.touched.email && formik.errors.email ? (
+                        <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
                     ) : null}
                 </div>
                 <div className="mb-4">

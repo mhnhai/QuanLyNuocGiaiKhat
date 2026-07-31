@@ -63,6 +63,16 @@ class OrderService {
         }
     }
 
+    async cancelOrder(orderId) {
+        try {
+            const response = await axios.patch(`${API_URL}/${orderId}/cancel`);
+            return response;
+        } catch (error) {
+            console.error(`Error canceling order with id ${orderId}:`, error);
+            throw error;
+        }
+    }
+
     async delete(orderId) {
         try {
             const response = await axios.delete(`${API_URL}/${orderId}`);

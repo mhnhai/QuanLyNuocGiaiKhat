@@ -5,6 +5,7 @@ import { LuSunMedium } from "react-icons/lu";
 import { IoMoonOutline, IoCart } from "react-icons/io5";
 import ProductService from "../services/product.service";
 import SearchBar from "./SearchBar";
+import { useAuth } from "../context/AuthContext";
 
 const categoryLinks = [
     { path: '/category/soft-drinks', name: 'Nước ngọt' },
@@ -29,7 +30,7 @@ const Navbar = () => {
         navigate('/products', { state: { selectedCategory: category } });
     };
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
     
     return (
         <div className="navbar bg-base-100 shadow-sm z-10 h-fit sticky top-0">

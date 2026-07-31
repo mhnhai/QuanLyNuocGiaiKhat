@@ -4,10 +4,11 @@ import OrderService from '../services/order.service';
 import payment_formService from "../services/payment_form.service";
 import ProductService from '../services/product.service';
 import { FaRegTrashAlt, FaInfo, FaExclamationTriangle } from "react-icons/fa";
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
     const [payment_forms, setPayment_forms] = useState([]);
     const [stockErrors, setStockErrors] = useState([]);
     const navigate = useNavigate();

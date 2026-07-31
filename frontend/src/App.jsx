@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import Customers from './pages/Customers';
@@ -22,38 +24,61 @@ const ProtectedStaffs = withAdminAuth(Staffs);
 const ProtectedSuppliers = withAdminAuth(Suppliers);
 const ProtectedSettings = withAdminAuth(Settings);
 
-const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('user'));
+const AuthenticatedRoute = ({ children }) => (
+    <AdminLayout>{children}</AdminLayout>
+);
 
-    const handleLogin = () => {
-        setIsAuthenticated(true);
-    };
+const wrap = (Component) => (
+    <AuthenticatedRoute>
+        <Component />
+    </AuthenticatedRoute>
+);
 
-    const handleLogout = () => {
-        setIsAuthenticated(false);
-    };
+const AppRoutes = () => {
+    const { isAuthenticated, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-base-200">
+                <span className="loading loading-spinner loading-lg text-primary" />
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+        );
+    }
 
     return (
-        <Router>
-            <div className="flex">
-                {isAuthenticated && <Sidebar />}
-                <div className={`flex-1 p-6 bg-gray-100 ${isAuthenticated ? '' : 'w-full'}`}>
-                    <Routes>
-                        <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
-                        <Route path="/" element={<ProtectedHome />} />
-                        <Route path="/products" element={<ProtectedProducts />} />
-                        <Route path="/customers" element={<ProtectedCustomers />} />
-                        <Route path="/orders" element={<ProtectedOrders />} />
-                        <Route path="/importations" element={<ProtectedImportation />} />
-                        <Route path="/staffs" element={<ProtectedStaffs />} />
-                        <Route path="/suppliers" element={<ProtectedSuppliers />} />
-                        <Route path="/settings" element={<ProtectedSettings />} />
-                        <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
-                    </Routes>
-                </div>
-            </div>
-        </Router>
+        <Routes>
+            <Route path="/login" element={<Navigate to="/" />} />
+            <Route path="/" element={wrap(ProtectedHome)} />
+            <Route path="/products" element={wrap(ProtectedProducts)} />
+            <Route path="/customers" element={wrap(ProtectedCustomers)} />
+            <Route path="/orders" element={wrap(ProtectedOrders)} />
+            <Route path="/importations" element={wrap(ProtectedImportation)} />
+            <Route path="/staffs" element={wrap(ProtectedStaffs)} />
+            <Route path="/suppliers" element={wrap(ProtectedSuppliers)} />
+            <Route path="/settings" element={wrap(ProtectedSettings)} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
     );
 };
 
-export default App; 
+const App = () => (
+    <ThemeProvider>
+        <Router>
+            <AuthProvider>
+                <AppRoutes />
+            </AuthProvider>
+        </Router>
+    </ThemeProvider>
+);
+
+export default App;

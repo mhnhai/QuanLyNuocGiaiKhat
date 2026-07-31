@@ -9,6 +9,7 @@ const uploadImage = async (file) => {
 
         // Note: We're sending the FormData directly, not wrapping it in an object
         const response = await axios.post(API_URL, formData, {
+            withCredentials: true,
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

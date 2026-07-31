@@ -3,6 +3,7 @@ import OrderService from "../services/order.service";
 import productService from '../services/product.service';
 import { FaTrash } from "react-icons/fa";
 import formatDateTime from '../utils/formatDateTime';
+import { useAuth } from '../context/AuthContext';
 
 const History = () => {
     const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const History = () => {
     const [error, setError] = useState(null);
     const [dateFilter, setDateFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
-    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const { user: currentUser } = useAuth();
 
     const statusOptions = [
         { value: 'all', label: 'Tất cả' },
@@ -23,8 +24,10 @@ const History = () => {
     ];
 
     useEffect(() => {
-        fetchOrders();
-    }, [currentUser.id]);
+        if (currentUser?.id) {
+            fetchOrders();
+        }
+    }, [currentUser?.id]);
 
     const fetchOrders = async () => {
         try {
@@ -52,7 +55,7 @@ const History = () => {
     const handleCancelOrder = async (orderId) => {
         if (window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
             try {
-                await OrderService.updateOrderStatus(orderId, 'Đã hủy');
+                await OrderService.cancelOrder(orderId);
                 setOrders(orders.map(order =>
                     order._id === orderId
                         ? { ...order, status: 'Đã hủy' }
@@ -60,7 +63,8 @@ const History = () => {
                 ));
             } catch (error) {
                 console.error('Error canceling order:', error);
-                alert('Không thể hủy đơn hàng');
+                const message = error.response?.data?.detail || 'Không thể hủy đơn hàng';
+                alert(message);
             }
         }
     };
